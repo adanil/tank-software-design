@@ -1,18 +1,26 @@
-package ru.mipt.bit.platformer.util;
+package ru.mipt.bit.platformer;
 
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.GridPoint2;
-import com.badlogic.gdx.math.Rectangle;
+import ru.mipt.bit.platformer.util.Graphics;
+import ru.mipt.bit.platformer.util.Rotation;
+
+import static com.badlogic.gdx.math.MathUtils.isEqual;
+import static ru.mipt.bit.platformer.util.GdxGameUtils.continueProgress;
 
 public class Player {
+    private Graphics graphics;
+
     private Rotation rotation;
     private GridPoint2 currentCoordinates;
     private GridPoint2 destinationCoordinates;
     private float playerMovementProgress;
-    private Texture blueTankTexture;
-    private TextureRegion graphics;
-    private Rectangle rectangle;
+    public Graphics getGraphics() {
+        return graphics;
+    }
+
+    public void setGraphics(Graphics graphics) {
+        this.graphics = graphics;
+    }
 
     public void currentCoordinatesIncrementX(){
         currentCoordinates.x++;
@@ -42,11 +50,12 @@ public class Player {
         destinationCoordinates.y--;
     }
 
-    public Player() {
-        destinationCoordinates = new GridPoint2(1,1);
-        currentCoordinates = new GridPoint2(1,1);
-        rotation = Rotation.RIGHT;
-        playerMovementProgress = 1f;
+    public Player(GridPoint2 destinationCoordinates, GridPoint2 currentCoordinates, Rotation rotation, Graphics graphics) {
+        this.destinationCoordinates = destinationCoordinates;
+        this.currentCoordinates = currentCoordinates;
+        this.rotation = rotation;
+        this.playerMovementProgress = 1f;
+        this.graphics = graphics;
     }
 
     public Rotation getRotation() {
@@ -80,28 +89,12 @@ public class Player {
     public void setPlayerMovementProgress(float playerMovementProgress) {
         this.playerMovementProgress = playerMovementProgress;
     }
-
-    public Texture getBlueTankTexture() {
-        return blueTankTexture;
-    }
-
-    public void setBlueTankTexture(Texture blueTankTexture) {
-        this.blueTankTexture = blueTankTexture;
-    }
-
-    public TextureRegion getGraphics() {
-        return graphics;
-    }
-
-    public void setGraphics(TextureRegion graphics) {
-        this.graphics = graphics;
-    }
-
-    public Rectangle getRectangle() {
-        return rectangle;
-    }
-
-    public void setRectangle(Rectangle rectangle) {
-        this.rectangle = rectangle;
+    
+    public void calculateMovementProgress(float deltaTime, float MOVEMENT_SPEED){
+        setPlayerMovementProgress(continueProgress(getPlayerMovementProgress(), deltaTime, MOVEMENT_SPEED));
+        if (isEqual(getPlayerMovementProgress(), 1f)) {
+            // record that the player has reached his/her destination
+            setCurrentCoordinates(getDestinationCoordinates());
+        }
     }
 }

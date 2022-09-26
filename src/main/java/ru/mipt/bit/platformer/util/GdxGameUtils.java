@@ -49,9 +49,9 @@ public final class GdxGameUtils {
         }
     }
 
-    public static Rectangle moveRectangleAtTileCenter(TiledMapTileLayer tileLayer, Rectangle rectangle, GridPoint2 tileCoordinates) {
+    public static Rectangle moveRectangleAtTileCenter(TiledMapTileLayer tileLayer, Graphics graphics, GridPoint2 tileCoordinates) {
         Vector2 tileCenter = calculateTileCenter(tileLayer, tileCoordinates);
-        return rectangle.setCenter(tileCenter);
+        return graphics.getRectangle().setCenter(tileCenter);
     }
 
     public static GridPoint2 incrementedY(GridPoint2 point) {
@@ -70,7 +70,9 @@ public final class GdxGameUtils {
         return new GridPoint2(point).add(1, 0);
     }
 
-    public static void drawTextureRegionUnscaled(Batch batch, TextureRegion region, Rectangle rectangle, float rotation) {
+    public static void drawTextureRegionUnscaled(Batch batch, Graphics graphics, float rotation) {
+        Rectangle rectangle = graphics.getRectangle();
+        TextureRegion region = graphics.getGraphics();
         int regionWidth = region.getRegionWidth();
         int regionHeight = region.getRegionHeight();
         float regionOriginX = regionWidth / 2f;

@@ -2,19 +2,28 @@ package ru.mipt.bit.platformer.util;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Rectangle;
 
-public class Obstacle {
-    private Texture texture;
-    private TextureRegion graphics;
-    private GridPoint2 coordinates;
-    private Rectangle rectangle;
+import static ru.mipt.bit.platformer.util.GdxGameUtils.createBoundingRectangle;
 
-    public Obstacle(Texture texture, TextureRegion graphics, GridPoint2 coordinates, Rectangle rectangle) {
+public class Graphics {
+    Texture texture;
+    TextureRegion graphics;
+    Rectangle rectangle;
+
+    public Graphics() {
+    }
+
+    public Graphics(Texture texture) {
+        this.texture = texture;
+        // TextureRegion represents Texture portion, there may be many TextureRegion instances of the same Texture
+        this.graphics = new TextureRegion(this.texture);
+        this.rectangle = createBoundingRectangle(this.graphics);
+    }
+
+    public Graphics(Texture texture, TextureRegion graphics, Rectangle rectangle) {
         this.texture = texture;
         this.graphics = graphics;
-        this.coordinates = coordinates;
         this.rectangle = rectangle;
     }
 
@@ -32,14 +41,6 @@ public class Obstacle {
 
     public void setGraphics(TextureRegion graphics) {
         this.graphics = graphics;
-    }
-
-    public GridPoint2 getCoordinates() {
-        return coordinates;
-    }
-
-    public void setCoordinates(GridPoint2 coordinates) {
-        this.coordinates = coordinates;
     }
 
     public Rectangle getRectangle() {

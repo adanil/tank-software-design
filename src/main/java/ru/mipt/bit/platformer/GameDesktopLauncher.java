@@ -7,20 +7,17 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.MapRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Interpolation;
-import ru.mipt.bit.platformer.util.Obstacle;
-import ru.mipt.bit.platformer.util.Player;
-import ru.mipt.bit.platformer.util.TileMovement;
+import ru.mipt.bit.platformer.util.*;
 
 import static com.badlogic.gdx.math.MathUtils.isEqual;
 import static ru.mipt.bit.platformer.util.GdxGameUtils.*;
-import static ru.mipt.bit.platformer.util.Control.*;
+import static com.badlogic.gdx.Input.Keys.*;
 
 public class GameDesktopLauncher implements ApplicationListener {
 
@@ -30,11 +27,13 @@ public class GameDesktopLauncher implements ApplicationListener {
 
     private TiledMap level;
     private MapRenderer levelRenderer;
-    private TileMovement tileMovement;
+    private IMoveRectangle tileMovement;
 
     Obstacle tree;
 
     Player player;
+
+    IMoveControl controller;
 
     @Override
     public void create() {
@@ -44,24 +43,16 @@ public class GameDesktopLauncher implements ApplicationListener {
         level = new TmxMapLoader().load("level.tmx");
         levelRenderer = createSingleLayerMapRenderer(level, batch);
         TiledMapTileLayer groundLayer = getSingleLayer(level);
+
         tileMovement = new TileMovement(groundLayer, Interpolation.smooth);
 
-        // set player initial position
-        player = new Player();
-        // Texture decodes an image file and loads it into GPU memory, it represents a native resource
-        player.setBlueTankTexture(new Texture("images/tank_blue.png"));
-        // TextureRegion represents Texture portion, there may be many TextureRegion instances of the same Texture
-        player.setGraphics(new TextureRegion(player.getBlueTankTexture()));
-        player.setRectangle(createBoundingRectangle(player.getGraphics()));
+        player = new Player(new GridPoint2(1, 1), new GridPoint2(1, 1), Rotation.RIGHT,new Graphics(new Texture("images/tank_blue.png")));
 
+        tree = new Obstacle(new GridPoint2(1, 3),new Graphics(new Texture("images/greenTree.png")));
 
-        var greenTreeTexture = new Texture("images/greenTree.png");
-        var treeObstacleGraphics = new TextureRegion(greenTreeTexture);
-        var treeObstacleCoordinates = new GridPoint2(1, 3);
-        var treeObstacleRectangle = createBoundingRectangle(treeObstacleGraphics);
-        tree = new Obstacle(greenTreeTexture,treeObstacleGraphics,treeObstacleCoordinates,treeObstacleRectangle);
+        controller = new Control(new ControlButtons(UP,W,DOWN,S,LEFT,A,RIGHT,D));
 
-        moveRectangleAtTileCenter(groundLayer, tree.getRectangle(), tree.getCoordinates());
+        moveRectangleAtTileCenter(groundLayer, tree.getGraphics(), tree.getCoordinates());
     }
 
     @Override
@@ -71,17 +62,17 @@ public class GameDesktopLauncher implements ApplicationListener {
         // get time passed since the last render
         float deltaTime = Gdx.graphics.getDeltaTime();
 
-        move(player, tree);
+        controller.movePlayer(player, tree);
 
         // calculate interpolated player screen coordinates
-        tileMovement.moveRectangleBetweenTileCenters(player.getRectangle(), player.getCurrentCoordinates(), player.getDestinationCoordinates(), player.getPlayerMovementProgress());
+        tileMovement.moveRectangleBetweenTileCenters(player.getGraphics(), player.getCurrentCoordinates(), player.getDestinationCoordinates(), player.getPlayerMovementProgress());
 
-        player.setPlayerMovementProgress(continueProgress(player.getPlayerMovementProgress(), deltaTime, MOVEMENT_SPEED));
-        if (isEqual(player.getPlayerMovementProgress(), 1f)) {
-            // record that the player has reached his/her destination
-            player.setCurrentCoordinates(player.getDestinationCoordinates());
-        }
+        player.calculateMovementProgress(deltaTime,MOVEMENT_SPEED);
 
+        renderObjects();
+    }
+
+    private void renderObjects() {
         // render each tile of the level
         levelRenderer.render();
 
@@ -89,10 +80,10 @@ public class GameDesktopLauncher implements ApplicationListener {
         batch.begin();
 
         // render player
-        drawTextureRegionUnscaled(batch, player.getGraphics(), player.getRectangle(), player.getRotation().value);
+        drawTextureRegionUnscaled(batch, player.getGraphics(), player.getRotation().value);
 
         // render tree obstacle
-        drawTextureRegionUnscaled(batch, tree.getGraphics(), tree.getRectangle(), 0f);
+        drawTextureRegionUnscaled(batch, tree.getGraphics(), 0f);
 
         // submit all drawing requests
         batch.end();
@@ -116,8 +107,8 @@ public class GameDesktopLauncher implements ApplicationListener {
     @Override
     public void dispose() {
         // dispose of all the native resources (classes which implement com.badlogic.gdx.utils.Disposable)
-        tree.getTexture().dispose();
-        player.getBlueTankTexture().dispose();
+        tree.getGraphics().getTexture().dispose();
+        player.getGraphics().getTexture().dispose();
         level.dispose();
         batch.dispose();
     }
