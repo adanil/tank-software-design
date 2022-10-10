@@ -6,6 +6,10 @@ import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Rectangle;
 import ru.mipt.bit.platformer.util.Graphics;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Random;
+
 public class Obstacle {
     private GridPoint2 coordinates;
 
@@ -31,6 +35,27 @@ public class Obstacle {
 
     public void setCoordinates(GridPoint2 coordinates) {
         this.coordinates = coordinates;
+    }
+
+    static public ArrayList<Obstacle> generateRandomObstacles(Texture texture,int levelWidth, int levelHeight){
+        Random ran = new Random();
+        int numberOfObstacles = ran.nextInt(levelWidth*levelHeight/4) + 1;
+
+        HashSet<GridPoint2> obstacleCoords = new HashSet<>();
+        ArrayList<Obstacle> obstacles = new ArrayList<>();
+        int count = 0;
+        while(count < numberOfObstacles){
+            int x = ran.nextInt(levelWidth);
+            int y = ran.nextInt(levelHeight);
+            GridPoint2 coords = new GridPoint2(x,y);
+            if (!obstacleCoords.contains(coords)) {
+                obstacleCoords.add(coords);
+                obstacles.add(new Obstacle(coords,new Graphics(texture)));
+                count++;
+            }
+        }
+        return obstacles;
+
     }
 
 }

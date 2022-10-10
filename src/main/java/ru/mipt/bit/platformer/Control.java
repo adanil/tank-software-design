@@ -1,6 +1,9 @@
 package ru.mipt.bit.platformer;
 
+import com.badlogic.gdx.math.GridPoint2;
 import ru.mipt.bit.platformer.util.*;
+
+import java.util.Collection;
 
 import static com.badlogic.gdx.math.MathUtils.isEqual;
 import static ru.mipt.bit.platformer.util.GdxGameUtils.*;
@@ -13,63 +16,41 @@ public class Control implements IMoveControl {
     }
 
     @Override
-    public void movePlayer(Player player, Obstacle obstacle){
+    public void movePlayer(Player player, Collection<Obstacle> obstacles){
         if (isButtonPressed(controlButtons.getUpButton1(), controlButtons.getUpButton2())) {
-            moveUp(player,obstacle);
+            move(player,MoveVector.UP, obstacles);
         }
         if (isButtonPressed(controlButtons.getLeftButton1(), controlButtons.getLeftButton2())) {
-            moveLeft(player,obstacle);
+            move(player,MoveVector.LEFT, obstacles);
         }
         if (isButtonPressed(controlButtons.getDownButton1(), controlButtons.getDownButton2())) {
-            moveDown(player,obstacle);
+            move(player,MoveVector.DOWN, obstacles);
         }
         if (isButtonPressed(controlButtons.getRightButton1(), controlButtons.getRightButton2())) {
-            moveRight(player,obstacle);
+            move(player,MoveVector.RIGHT, obstacles);
         }
     }
 
+    public boolean checkCollision(GridPoint2 playerDestCoords, Collection<Obstacle> obstacles){
+        for (Obstacle obstacle : obstacles){
+            if (obstacle.getCoordinates().equals(playerDestCoords))
+                return true;
+        }
+        return false;
+    }
+
     @Override
-    public void moveUp(Player player, Obstacle obstacle){
+    public void move(Player player, MoveVector moveVector, Collection<Obstacle> obstacles){
         if (isEqual(player.getPlayerMovementProgress(), 1f)) {
+            GridPoint2 playerDestCoords = player.getDestinationCoordinates().cpy().add(moveVector.vector);
             // check potential player destination for collision with obstacles
-            if (!obstacle.getCoordinates().equals(incrementedY(player.getCurrentCoordinates()))) {
-                player.destinationCoordinatesIncrementY();
+            if (!checkCollision(playerDestCoords,obstacles)) {
+                player.setDestinationCoordinates(playerDestCoords);
                 player.setPlayerMovementProgress(0f);
             }
-            player.setRotation(Rotation.UP);
+            player.setRotation(moveVector.rotation);
         }
     }
 
-    @Override
-    public void moveLeft(Player player, Obstacle obstacle){
-        if (isEqual(player.getPlayerMovementProgress(), 1f)) {
-            if (!obstacle.getCoordinates().equals(decrementedX(player.getCurrentCoordinates()))) {
-                player.destinationCoordinatesDecrementX();
-                player.setPlayerMovementProgress(0f);
-            }
-            player.setRotation(Rotation.LEFT);
-        }
-    }
 
-    @Override
-    public void moveDown(Player player, Obstacle obstacle){
-        if (isEqual(player.getPlayerMovementProgress(), 1f)) {
-            if (!obstacle.getCoordinates().equals(decrementedY(player.getCurrentCoordinates()))) {
-                player.destinationCoordinatesDecrementY();
-                player.setPlayerMovementProgress(0f);
-            }
-            player.setRotation(Rotation.DOWN);
-        }
-    }
-
-    @Override
-    public void moveRight(Player player, Obstacle obstacle){
-        if (isEqual(player.getPlayerMovementProgress(), 1f)) {
-            if (!obstacle.getCoordinates().equals(incrementedX(player.getCurrentCoordinates()))) {
-                player.destinationCoordinatesIncrementX();
-                player.setPlayerMovementProgress(0f);
-            }
-            player.setRotation(Rotation.RIGHT);
-        }
-    }
 }

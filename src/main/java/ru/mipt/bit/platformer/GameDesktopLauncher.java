@@ -13,7 +13,10 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Interpolation;
+import com.badlogic.gdx.math.Rectangle;
 import ru.mipt.bit.platformer.util.*;
+
+import java.util.Collection;
 
 import static com.badlogic.gdx.math.MathUtils.isEqual;
 import static ru.mipt.bit.platformer.util.GdxGameUtils.*;
@@ -29,7 +32,7 @@ public class GameDesktopLauncher implements ApplicationListener {
     private MapRenderer levelRenderer;
     private IMoveRectangle tileMovement;
 
-    Obstacle tree;
+    Collection<Obstacle> trees;
 
     Player player;
 
@@ -48,11 +51,11 @@ public class GameDesktopLauncher implements ApplicationListener {
 
         player = Player.createPlayerWithRandomPos(new Graphics(new Texture("images/tank_blue.png")),groundLayer.getWidth(),groundLayer.getHeight());
 
-        tree = new Obstacle(new GridPoint2(1, 3),new Graphics(new Texture("images/greenTree.png")));
+        trees = Obstacle.generateRandomObstacles(new Texture("images/greenTree.png"),groundLayer.getWidth(),groundLayer.getHeight());
 
         controller = new Control(new ControlButtons(UP,W,DOWN,S,LEFT,A,RIGHT,D));
 
-        moveRectangleAtTileCenter(groundLayer, tree.getGraphics(), tree.getCoordinates());
+        setObstaclesAtTileCenter(groundLayer,trees);
     }
 
     @Override
@@ -62,7 +65,7 @@ public class GameDesktopLauncher implements ApplicationListener {
         // get time passed since the last render
         float deltaTime = Gdx.graphics.getDeltaTime();
 
-        controller.movePlayer(player, tree);
+        controller.movePlayer(player, trees);
 
         // calculate interpolated player screen coordinates
         tileMovement.moveRectangleBetweenTileCenters(player.getGraphics(), player.getCurrentCoordinates(), player.getDestinationCoordinates(), player.getPlayerMovementProgress());
@@ -83,10 +86,18 @@ public class GameDesktopLauncher implements ApplicationListener {
         drawTextureRegionUnscaled(batch, player.getGraphics(), player.getRotation().value);
 
         // render tree obstacle
-        drawTextureRegionUnscaled(batch, tree.getGraphics(), 0f);
+        for (Obstacle tree : trees) {
+            drawTextureRegionUnscaled(batch, tree.getGraphics(), 0f);
+        }
 
         // submit all drawing requests
         batch.end();
+    }
+
+    private void setObstaclesAtTileCenter(TiledMapTileLayer groundLayer,Collection<Obstacle> obstacles) {
+        for (Obstacle obstacle : obstacles) {
+            moveRectangleAtTileCenter(groundLayer, obstacle.getGraphics(), obstacle.getCoordinates());
+        }
     }
 
     @Override
@@ -107,7 +118,9 @@ public class GameDesktopLauncher implements ApplicationListener {
     @Override
     public void dispose() {
         // dispose of all the native resources (classes which implement com.badlogic.gdx.utils.Disposable)
-        tree.getGraphics().getTexture().dispose();
+        for (Obstacle tree : trees) {
+            tree.getGraphics().getTexture().dispose();
+        }
         player.getGraphics().getTexture().dispose();
         level.dispose();
         batch.dispose();
