@@ -4,6 +4,8 @@ import com.badlogic.gdx.math.GridPoint2;
 import ru.mipt.bit.platformer.util.Graphics;
 import ru.mipt.bit.platformer.util.Rotation;
 
+import java.util.Random;
+
 import static com.badlogic.gdx.math.MathUtils.isEqual;
 import static ru.mipt.bit.platformer.util.GdxGameUtils.continueProgress;
 
@@ -96,5 +98,13 @@ public class Player {
             // record that the player has reached his/her destination
             setCurrentCoordinates(getDestinationCoordinates());
         }
+    }
+
+    static public Player createPlayerWithRandomPos(Graphics graphics,int levelWidth, int levelHeight){
+        Random ran = new Random();
+        int x = ran.nextInt(levelWidth);
+        int y = ran.nextInt(levelHeight);
+        GridPoint2 coords = new GridPoint2(x,y);
+        return new Player(coords,coords,Rotation.RIGHT,graphics);
     }
 }

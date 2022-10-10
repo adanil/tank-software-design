@@ -46,7 +46,7 @@ public class GameDesktopLauncher implements ApplicationListener {
 
         tileMovement = new TileMovement(groundLayer, Interpolation.smooth);
 
-        player = new Player(new GridPoint2(1, 1), new GridPoint2(1, 1), Rotation.RIGHT,new Graphics(new Texture("images/tank_blue.png")));
+        player = Player.createPlayerWithRandomPos(new Graphics(new Texture("images/tank_blue.png")),groundLayer.getWidth(),groundLayer.getHeight());
 
         tree = new Obstacle(new GridPoint2(1, 3),new Graphics(new Texture("images/greenTree.png")));
 
