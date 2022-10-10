@@ -26,12 +26,12 @@ public class ReadMapCreation implements ICreationMapStrategy{
         for (int i = 0;i < map.size();i++){
             for (int j = 0;j < map.get(i).size();j++){
                 int x = j;
-                int y = params.getGroundLayer().getHeight() - i - 1;
+                int y = map.size();
                 Character ch = map.get(i).get(j);
                 if (ch.equals('T')){
-                    obstacles.add(new Obstacle(new GridPoint2(x,y),new Graphics(params.getObstacleTexture())));
+                    obstacles.add(new Obstacle(new GridPoint2(x,y)));
                 } else if (ch.equals('X')) {
-                    player = new Player(new GridPoint2(x,y),new GridPoint2(x,y),Rotation.RIGHT,new Graphics(params.getPlayerTexture()));
+                    player = new Player(new GridPoint2(x,y),new GridPoint2(x,y),Rotation.RIGHT);
                 }
             }
         }

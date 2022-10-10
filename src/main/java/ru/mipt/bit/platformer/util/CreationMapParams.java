@@ -5,32 +5,28 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 
 public class CreationMapParams {
     private final String mapFilePath;
-    private final TiledMapTileLayer groundLayer;
-
-    private final Texture playerTexture;
-    private final Texture obstacleTexture;
+    private final int width;
+    private final int height;
 
 
-    public CreationMapParams(String mapFilePath,TiledMapTileLayer groundLayer,Texture playerTexture, Texture obstacleTexture) {
+
+
+    public CreationMapParams(String mapFilePath,int width,int height) {
         this.mapFilePath = mapFilePath;
-        this.groundLayer = groundLayer;
-        this.playerTexture = playerTexture;
-        this.obstacleTexture = obstacleTexture;
+        this.width = width;
+        this.height = height;
+
     }
 
     public String getMapFilePath() {
         return mapFilePath;
     }
 
-    public TiledMapTileLayer getGroundLayer() {
-        return groundLayer;
+    public int getWidth() {
+        return width;
     }
 
-    public Texture getPlayerTexture() {
-        return playerTexture;
-    }
-
-    public Texture getObstacleTexture() {
-        return obstacleTexture;
+    public int getHeight() {
+        return height;
     }
 }

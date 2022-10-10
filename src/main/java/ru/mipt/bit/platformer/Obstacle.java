@@ -15,7 +15,11 @@ public class Obstacle {
 
     private Graphics graphics;
 
-    public Obstacle(GridPoint2 coordinates,Graphics graphics) {
+    public Obstacle(GridPoint2 coordinates) {
+        this.coordinates = coordinates;
+    }
+
+    public Obstacle(GridPoint2 coordinates, Graphics graphics) {
         this.coordinates = coordinates;
         this.graphics = graphics;
     }
@@ -37,7 +41,7 @@ public class Obstacle {
         this.coordinates = coordinates;
     }
 
-    static public ArrayList<Obstacle> generateRandomObstacles(Texture texture,int levelWidth, int levelHeight){
+    static public ArrayList<Obstacle> generateRandomObstacles(int levelWidth, int levelHeight){
         Random ran = new Random();
         int numberOfObstacles = ran.nextInt(levelWidth*levelHeight/4) + 1;
 
@@ -45,12 +49,12 @@ public class Obstacle {
         ArrayList<Obstacle> obstacles = new ArrayList<>();
         int count = 0;
         while(count < numberOfObstacles){
-            int x = ran.nextInt(levelWidth);
-            int y = ran.nextInt(levelHeight);
+            int x = ran.nextInt(levelWidth - 1) + 1;
+            int y = ran.nextInt(levelHeight - 1) + 1;
             GridPoint2 coords = new GridPoint2(x,y);
             if (!obstacleCoords.contains(coords)) {
                 obstacleCoords.add(coords);
-                obstacles.add(new Obstacle(coords,new Graphics(texture)));
+                obstacles.add(new Obstacle(coords));
                 count++;
             }
         }

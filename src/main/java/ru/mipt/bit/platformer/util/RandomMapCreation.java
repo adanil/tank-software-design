@@ -13,8 +13,8 @@ public class RandomMapCreation implements ICreationMapStrategy{
 
     @Override
     public void createMap(CreationMapParams params) {
-        player = Player.createPlayerWithRandomPos(new Graphics(params.getPlayerTexture()),params.getGroundLayer().getWidth(),params.getGroundLayer().getHeight());
-        obstacles = Obstacle.generateRandomObstacles(params.getObstacleTexture(),params.getGroundLayer().getWidth(),params.getGroundLayer().getHeight());
+        player = Player.createPlayerWithRandomPos(params.getWidth(),params.getHeight());
+        obstacles = Obstacle.generateRandomObstacles(params.getWidth(),params.getHeight());
     }
 
     @Override

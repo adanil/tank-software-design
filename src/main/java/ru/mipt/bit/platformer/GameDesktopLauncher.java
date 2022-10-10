@@ -11,9 +11,7 @@ import com.badlogic.gdx.maps.MapRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
-import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Interpolation;
-import com.badlogic.gdx.math.Rectangle;
 import ru.mipt.bit.platformer.util.*;
 
 import java.util.Collection;
@@ -54,18 +52,26 @@ public class GameDesktopLauncher implements ApplicationListener {
         tileMovement = new TileMovement(groundLayer, Interpolation.smooth);
 
         creationMapStrategy = new ReadMapCreation();
-        createMap(groundLayer,creationMapStrategy);
+        createMap(groundLayer,creationMapStrategy, "src/main/resources/levels/level1", "images/tank_blue.png", "images/greenTree.png");
 
         controller = new Control(new ControlButtons(UP,W,DOWN,S,LEFT,A,RIGHT,D));
 
         setObstaclesAtTileCenter(groundLayer,trees);
     }
 
-    private void createMap(TiledMapTileLayer groundLayer,ICreationMapStrategy creationMapStrategy) {
-        CreationMapParams mapParams = new CreationMapParams("src/main/resources/levels/level1", groundLayer,new Texture("images/tank_blue.png"),new Texture("images/greenTree.png"));
+    private void createMap(TiledMapTileLayer groundLayer, ICreationMapStrategy creationMapStrategy, String mapFilePath, String playerTexturePath, String obstacleTexturePath) {
+        CreationMapParams mapParams = new CreationMapParams(mapFilePath,groundLayer.getWidth(),groundLayer.getHeight());
         creationMapStrategy.createMap(mapParams);
         player = creationMapStrategy.getPlayer();
         trees = creationMapStrategy.getObstacles();
+        setGraphics(playerTexturePath, obstacleTexturePath);
+    }
+
+    private void setGraphics(String playerTexturePath, String obstacleTexturePath) {
+        player.setGraphics(new Graphics(new Texture(playerTexturePath)));
+        for (Obstacle tree : trees){
+            tree.setGraphics(new Graphics(new Texture(obstacleTexturePath)));
+        }
     }
 
     @Override

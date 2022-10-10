@@ -52,12 +52,11 @@ public class Player {
         destinationCoordinates.y--;
     }
 
-    public Player(GridPoint2 destinationCoordinates, GridPoint2 currentCoordinates, Rotation rotation, Graphics graphics) {
+    public Player(GridPoint2 destinationCoordinates, GridPoint2 currentCoordinates, Rotation rotation) {
         this.destinationCoordinates = destinationCoordinates;
         this.currentCoordinates = currentCoordinates;
         this.rotation = rotation;
         this.playerMovementProgress = 1f;
-        this.graphics = graphics;
     }
 
     public Rotation getRotation() {
@@ -100,11 +99,11 @@ public class Player {
         }
     }
 
-    static public Player createPlayerWithRandomPos(Graphics graphics,int levelWidth, int levelHeight){
+    static public Player createPlayerWithRandomPos(int levelWidth, int levelHeight){
         Random ran = new Random();
-        int x = ran.nextInt(levelWidth);
-        int y = ran.nextInt(levelHeight);
+        int x = ran.nextInt(levelWidth - 1) + 1;
+        int y = ran.nextInt(levelHeight - 1) + 1;
         GridPoint2 coords = new GridPoint2(x,y);
-        return new Player(coords,coords,Rotation.RIGHT,graphics);
+        return new Player(coords,coords,Rotation.RIGHT);
     }
 }
