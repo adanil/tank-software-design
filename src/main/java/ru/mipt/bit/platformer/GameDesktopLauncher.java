@@ -38,6 +38,10 @@ public class GameDesktopLauncher implements ApplicationListener {
 
     IMoveControl controller;
 
+    ICreationMapStrategy creationMapStrategy;
+
+
+
     @Override
     public void create() {
         batch = new SpriteBatch();
@@ -49,13 +53,19 @@ public class GameDesktopLauncher implements ApplicationListener {
 
         tileMovement = new TileMovement(groundLayer, Interpolation.smooth);
 
-        player = Player.createPlayerWithRandomPos(new Graphics(new Texture("images/tank_blue.png")),groundLayer.getWidth(),groundLayer.getHeight());
-
-        trees = Obstacle.generateRandomObstacles(new Texture("images/greenTree.png"),groundLayer.getWidth(),groundLayer.getHeight());
+        creationMapStrategy = new ReadMapCreation();
+        createMap(groundLayer,creationMapStrategy);
 
         controller = new Control(new ControlButtons(UP,W,DOWN,S,LEFT,A,RIGHT,D));
 
         setObstaclesAtTileCenter(groundLayer,trees);
+    }
+
+    private void createMap(TiledMapTileLayer groundLayer,ICreationMapStrategy creationMapStrategy) {
+        CreationMapParams mapParams = new CreationMapParams("src/main/resources/levels/level1", groundLayer,new Texture("images/tank_blue.png"),new Texture("images/greenTree.png"));
+        creationMapStrategy.createMap(mapParams);
+        player = creationMapStrategy.getPlayer();
+        trees = creationMapStrategy.getObstacles();
     }
 
     @Override
