@@ -26,7 +26,7 @@ public class ReadMapCreation implements ICreationMapStrategy{
         for (int i = 0;i < map.size();i++){
             for (int j = 0;j < map.get(i).size();j++){
                 int x = j;
-                int y = map.size();
+                int y = map.size() - i + 1;
                 Character ch = map.get(i).get(j);
                 if (ch.equals('T')){
                     obstacles.add(new Obstacle(new GridPoint2(x,y)));
