@@ -22,7 +22,7 @@ public class CreationMapTest {
         assertEquals(readMapCreationAlg.getObstacles().size(),15);
 
         assertEquals(readMapCreationAlg.getPlayer().getCurrentCoordinates().x,5);
-        assertEquals(readMapCreationAlg.getPlayer().getCurrentCoordinates().y,6);
+        assertEquals(readMapCreationAlg.getPlayer().getCurrentCoordinates().y,3);
     }
 
     @Test
