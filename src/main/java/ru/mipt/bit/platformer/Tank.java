@@ -3,13 +3,16 @@ package ru.mipt.bit.platformer;
 import com.badlogic.gdx.math.GridPoint2;
 import ru.mipt.bit.platformer.util.Graphics;
 import ru.mipt.bit.platformer.util.Rotation;
+import ru.mipt.bit.platformer.util.TileObject;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Random;
 
 import static com.badlogic.gdx.math.MathUtils.isEqual;
 import static ru.mipt.bit.platformer.util.GdxGameUtils.continueProgress;
 
-public class Player {
+public class Tank {
     private Graphics graphics;
 
     private Rotation rotation;
@@ -52,7 +55,7 @@ public class Player {
         destinationCoordinates.y--;
     }
 
-    public Player(GridPoint2 destinationCoordinates, GridPoint2 currentCoordinates, Rotation rotation) {
+    public Tank(GridPoint2 destinationCoordinates, GridPoint2 currentCoordinates, Rotation rotation) {
         this.destinationCoordinates = destinationCoordinates;
         this.currentCoordinates = currentCoordinates;
         this.rotation = rotation;
@@ -91,19 +94,41 @@ public class Player {
         this.playerMovementProgress = playerMovementProgress;
     }
     
-    public void calculateMovementProgress(float deltaTime, float MOVEMENT_SPEED){
+    public void calculateMovementProgress(float deltaTime, float MOVEMENT_SPEED,Level level){
         setPlayerMovementProgress(continueProgress(getPlayerMovementProgress(), deltaTime, MOVEMENT_SPEED));
         if (isEqual(getPlayerMovementProgress(), 1f)) {
             // record that the player has reached his/her destination
+            if (!destinationCoordinates.equals(currentCoordinates))
+                level.clearTile(currentCoordinates);
             setCurrentCoordinates(getDestinationCoordinates());
         }
     }
 
-    static public Player createPlayerWithRandomPos(int levelWidth, int levelHeight){
+    static public Tank createPlayerWithRandomPos(int levelWidth, int levelHeight){
         Random ran = new Random();
         int x = ran.nextInt(levelWidth - 1) + 1;
         int y = ran.nextInt(levelHeight - 1) + 1;
         GridPoint2 coords = new GridPoint2(x,y);
-        return new Player(coords,coords,Rotation.RIGHT);
+        return new Tank(coords,coords,Rotation.RIGHT);
+    }
+
+    static public ArrayList<Tank> generateBotTanks(Level level,int botsCount){
+        ArrayList<Tank> bots = new ArrayList<>();
+        int created = 0;
+        while (created < botsCount){
+            Random ran = new Random();
+            int x = ran.nextInt(level.getWidth() - 1) + 1;
+            int y = ran.nextInt(level.getHeight() - 1) + 1;
+
+            if (level.getObjectByCoords(x,y) != TileObject.FREE)
+                continue;
+
+            int rot = ran.nextInt(4);
+            GridPoint2 coords = new GridPoint2(x,y);
+            bots.add(new Tank(coords,coords,Rotation.values()[rot]));
+            created++;
+        }
+        return bots;
+
     }
 }

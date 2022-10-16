@@ -1,24 +1,23 @@
 package ru.mipt.bit.platformer.util;
 
-import com.badlogic.gdx.graphics.Texture;
 import ru.mipt.bit.platformer.Obstacle;
-import ru.mipt.bit.platformer.Player;
+import ru.mipt.bit.platformer.Tank;
 
 import java.util.Collection;
 
 public class RandomMapCreation implements ICreationMapStrategy{
-    Player player;
+    Tank player;
     Collection<Obstacle> obstacles;
 
 
     @Override
     public void createMap(CreationMapParams params) {
-        player = Player.createPlayerWithRandomPos(params.getWidth(),params.getHeight());
+        player = Tank.createPlayerWithRandomPos(params.getWidth(),params.getHeight());
         obstacles = Obstacle.generateRandomObstacles(params.getWidth(),params.getHeight());
     }
 
     @Override
-    public Player getPlayer() {
+    public Tank getPlayer() {
         return player;
     }
 

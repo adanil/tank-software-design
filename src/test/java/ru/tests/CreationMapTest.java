@@ -1,7 +1,7 @@
 package ru.tests;
 
 import org.junit.jupiter.api.Test;
-import ru.mipt.bit.platformer.Player;
+import ru.mipt.bit.platformer.Tank;
 import ru.mipt.bit.platformer.util.CreationMapParams;
 import ru.mipt.bit.platformer.util.ICreationMapStrategy;
 import ru.mipt.bit.platformer.util.RandomMapCreation;
@@ -22,7 +22,7 @@ public class CreationMapTest {
         assertEquals(readMapCreationAlg.getObstacles().size(),15);
 
         assertEquals(readMapCreationAlg.getPlayer().getCurrentCoordinates().x,5);
-        assertEquals(readMapCreationAlg.getPlayer().getCurrentCoordinates().y,6);
+        assertEquals(readMapCreationAlg.getPlayer().getCurrentCoordinates().y,3);
     }
 
     @Test
@@ -33,7 +33,7 @@ public class CreationMapTest {
 
         ICreationMapStrategy randomMapCreationAlg  = new RandomMapCreation();
         randomMapCreationAlg.createMap(params);
-        Player player = randomMapCreationAlg.getPlayer();
+        Tank player = randomMapCreationAlg.getPlayer();
 
         if (!(player.getCurrentCoordinates().x < width && player.getCurrentCoordinates().x > 0 && player.getCurrentCoordinates().y < height && player.getCurrentCoordinates().y > 0)){
             fail("Width: " + width + " Height: " + height + " X: " + player.getCurrentCoordinates().x + " Y: " + player.getCurrentCoordinates().y);

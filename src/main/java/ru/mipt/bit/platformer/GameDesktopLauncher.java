@@ -14,6 +14,7 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.math.Interpolation;
 import ru.mipt.bit.platformer.util.*;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 import static com.badlogic.gdx.math.MathUtils.isEqual;
@@ -23,18 +24,26 @@ import static com.badlogic.gdx.Input.Keys.*;
 public class GameDesktopLauncher implements ApplicationListener {
 
     private static final float MOVEMENT_SPEED = 0.4f;
+    public static final String playerTexturePath = "images/tank_blue.png";
+    public static final String obstacleTexturePath = "images/greenTree.png";
+    public static final String mapFilePath = "src/main/resources/levels/level1";
 
     private Batch batch;
 
-    private TiledMap level;
+    private TiledMap levelGraphic;
     private MapRenderer levelRenderer;
     private IMoveRectangle tileMovement;
 
     Collection<Obstacle> trees;
 
-    Player player;
+    Tank player;
+
+    ArrayList<Tank> botTanks;
+
+    Level level;
 
     IMoveControl controller;
+    IMoveControl botController;
 
     ICreationMapStrategy creationMapStrategy;
 
@@ -45,30 +54,35 @@ public class GameDesktopLauncher implements ApplicationListener {
         batch = new SpriteBatch();
 
         // load level tiles
-        level = new TmxMapLoader().load("level.tmx");
-        levelRenderer = createSingleLayerMapRenderer(level, batch);
-        TiledMapTileLayer groundLayer = getSingleLayer(level);
+        levelGraphic = new TmxMapLoader().load("level.tmx");
+        levelRenderer = createSingleLayerMapRenderer(levelGraphic, batch);
+        TiledMapTileLayer groundLayer = getSingleLayer(levelGraphic);
 
         tileMovement = new TileMovement(groundLayer, Interpolation.smooth);
 
         creationMapStrategy = new ReadMapCreation();
-        createMap(groundLayer,creationMapStrategy, "src/main/resources/levels/level1", "images/tank_blue.png", "images/greenTree.png");
-
-        controller = new Control(new ControlButtons(UP,W,DOWN,S,LEFT,A,RIGHT,D));
-
-        setObstaclesAtTileCenter(groundLayer,trees);
-    }
-
-    private void createMap(TiledMapTileLayer groundLayer, ICreationMapStrategy creationMapStrategy, String mapFilePath, String playerTexturePath, String obstacleTexturePath) {
         CreationMapParams mapParams = new CreationMapParams(mapFilePath,groundLayer.getWidth(),groundLayer.getHeight());
-        creationMapStrategy.createMap(mapParams);
-        player = creationMapStrategy.getPlayer();
-        trees = creationMapStrategy.getObstacles();
+        level = new Level(groundLayer.getWidth(),groundLayer.getHeight());
+        level.createLevel(creationMapStrategy,mapParams);
+
+        player = level.getPlayer();
+        trees = level.getObstacles();
+        botTanks = level.getBots();
+
+        controller = new PlayerControl(new ControlButtons(UP,W,DOWN,S,LEFT,A,RIGHT,D));
+        botController = new BotControl();
+
         setGraphics(playerTexturePath, obstacleTexturePath);
+        setObstaclesAtTileCenter(groundLayer,trees);
     }
 
     private void setGraphics(String playerTexturePath, String obstacleTexturePath) {
         player.setGraphics(new Graphics(new Texture(playerTexturePath)));
+
+        for (Tank bot : botTanks){
+            bot.setGraphics(new Graphics(new Texture(playerTexturePath)));
+        }
+
         for (Obstacle tree : trees){
             tree.setGraphics(new Graphics(new Texture(obstacleTexturePath)));
         }
@@ -81,12 +95,16 @@ public class GameDesktopLauncher implements ApplicationListener {
         // get time passed since the last render
         float deltaTime = Gdx.graphics.getDeltaTime();
 
-        controller.movePlayer(player, trees);
-
+        controller.moveTank(player, level);
         // calculate interpolated player screen coordinates
         tileMovement.moveRectangleBetweenTileCenters(player.getGraphics(), player.getCurrentCoordinates(), player.getDestinationCoordinates(), player.getPlayerMovementProgress());
+        player.calculateMovementProgress(deltaTime,MOVEMENT_SPEED,level);
 
-        player.calculateMovementProgress(deltaTime,MOVEMENT_SPEED);
+        for (Tank bot : botTanks){
+            botController.moveTank(bot,level);
+            tileMovement.moveRectangleBetweenTileCenters(bot.getGraphics(), bot.getCurrentCoordinates(), bot.getDestinationCoordinates(), bot.getPlayerMovementProgress());
+            bot.calculateMovementProgress(deltaTime,MOVEMENT_SPEED,level);
+        }
 
         renderObjects();
     }
@@ -100,6 +118,10 @@ public class GameDesktopLauncher implements ApplicationListener {
 
         // render player
         drawTextureRegionUnscaled(batch, player.getGraphics(), player.getRotation().value);
+
+        for (Tank bot : botTanks){
+            drawTextureRegionUnscaled(batch,bot.getGraphics(),bot.getRotation().value);
+        }
 
         // render tree obstacle
         for (Obstacle tree : trees) {
@@ -137,8 +159,12 @@ public class GameDesktopLauncher implements ApplicationListener {
         for (Obstacle tree : trees) {
             tree.getGraphics().getTexture().dispose();
         }
+
+        for (Tank bot : botTanks){
+            bot.getGraphics().getTexture().dispose();
+        }
         player.getGraphics().getTexture().dispose();
-        level.dispose();
+        levelGraphic.dispose();
         batch.dispose();
     }
 
