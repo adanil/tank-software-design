@@ -22,32 +22,32 @@ public class PlayerControlTest {
     @Test
     public void testCheckCollision(){
         Level level = new Level(10,10);
-        PlayerControl playerControl = new PlayerControl(new ControlButtons(UP,W,DOWN,S,LEFT,A,RIGHT,D));
+        PlayerControl playerControl = new PlayerControl(new ControlButtons(UP,W,DOWN,S,LEFT,A,RIGHT,D),level);
         GridPoint2 coords = new GridPoint2(1,1);
         ArrayList<Obstacle> obstacles = new ArrayList<>();
 
         GridPoint2 obstacleCoords = new GridPoint2(1,1);
         obstacles.add(new Obstacle(obstacleCoords));
         level.addObjectOnMap(obstacleCoords.x, obstacleCoords.y, TileObject.OBSTACLE);
-        boolean collision = playerControl.checkCollision(coords,level);
+        boolean collision = playerControl.checkCollision(coords);
         assertTrue(collision);
 
         obstacleCoords = new GridPoint2(2,3);
         obstacles.add(new Obstacle(obstacleCoords));
         level.addObjectOnMap(obstacleCoords.x, obstacleCoords.y, TileObject.OBSTACLE);
-        collision = playerControl.checkCollision(coords,level);
+        collision = playerControl.checkCollision(coords);
         assertTrue(collision);
 
-        collision = playerControl.checkCollision(new GridPoint2(2,3),level);
+        collision = playerControl.checkCollision(new GridPoint2(2,3));
         assertTrue(collision);
 
-        collision = playerControl.checkCollision(new GridPoint2(4,7),level);
+        collision = playerControl.checkCollision(new GridPoint2(4,7));
         assertFalse(collision);
 
         obstacleCoords = new GridPoint2(4,7);
         obstacles.add(new Obstacle(obstacleCoords));
         level.addObjectOnMap(obstacleCoords.x, obstacleCoords.y, TileObject.OBSTACLE);
-        collision = playerControl.checkCollision(new GridPoint2(4,7),level);
+        collision = playerControl.checkCollision(new GridPoint2(4,7));
         assertTrue(collision);
     }
 
@@ -61,27 +61,29 @@ public class PlayerControlTest {
         obstacles.add(new Obstacle(obstacleCoords));
         level.addObjectOnMap(obstacleCoords.x,obstacleCoords.y,TileObject.OBSTACLE);
 
-        PlayerControl playerControl = new PlayerControl(new ControlButtons(UP, W, DOWN, S, LEFT, A, RIGHT, D));
+        PlayerControl playerControl = new PlayerControl(new ControlButtons(UP, W, DOWN, S, LEFT, A, RIGHT, D),level);
 
-        playerControl.move(player, MoveVector.UP,level,TileObject.PLAYER);
+        playerControl.move(player, MoveVector.UP,TileObject.PLAYER);
         assertEquals(player.getDestinationCoordinates().x,1);
         assertEquals(player.getDestinationCoordinates().y,2);
 
-        player.calculateMovementProgress(1,1.0f,level);
-        playerControl.move(player, MoveVector.RIGHT,level,TileObject.PLAYER);
+        playerControl.calculateMovementProgress(player,1,1.0f);
+        playerControl.move(player, MoveVector.RIGHT,TileObject.PLAYER);
         assertEquals(player.getDestinationCoordinates().x,2);
         assertEquals(player.getDestinationCoordinates().y,2);
 
-        player.calculateMovementProgress(1,1.0f,level);
-        playerControl.move(player, MoveVector.RIGHT,level,TileObject.PLAYER);
+        playerControl.calculateMovementProgress(player,1,1.0f);
+        playerControl.move(player, MoveVector.RIGHT,TileObject.PLAYER);
         assertEquals(player.getDestinationCoordinates().x,3);
         assertEquals(player.getDestinationCoordinates().y,2);
 
-        player.calculateMovementProgress(1,1.0f,level);        playerControl.move(player, MoveVector.LEFT,level,TileObject.PLAYER);
+        playerControl.calculateMovementProgress(player,1,1.0f);
+        playerControl.move(player, MoveVector.LEFT,TileObject.PLAYER);
         assertEquals(player.getDestinationCoordinates().x,2);
         assertEquals(player.getDestinationCoordinates().y,2);
 
-        player.calculateMovementProgress(1,1.0f,level);        playerControl.move(player, MoveVector.DOWN,level,TileObject.PLAYER);
+        playerControl.calculateMovementProgress(player,1,1.0f);
+        playerControl.move(player, MoveVector.DOWN,TileObject.PLAYER);
         assertEquals(player.getDestinationCoordinates().x,2);
         assertEquals(player.getDestinationCoordinates().y,1);
     }

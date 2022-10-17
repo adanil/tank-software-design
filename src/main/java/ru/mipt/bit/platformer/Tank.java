@@ -94,15 +94,7 @@ public class Tank {
         this.playerMovementProgress = playerMovementProgress;
     }
     
-    public void calculateMovementProgress(float deltaTime, float MOVEMENT_SPEED,Level level){
-        setPlayerMovementProgress(continueProgress(getPlayerMovementProgress(), deltaTime, MOVEMENT_SPEED));
-        if (isEqual(getPlayerMovementProgress(), 1f)) {
-            // record that the player has reached his/her destination
-            if (!destinationCoordinates.equals(currentCoordinates))
-                level.clearTile(currentCoordinates);
-            setCurrentCoordinates(getDestinationCoordinates());
-        }
-    }
+
 
     static public Tank createPlayerWithRandomPos(int levelWidth, int levelHeight){
         Random ran = new Random();

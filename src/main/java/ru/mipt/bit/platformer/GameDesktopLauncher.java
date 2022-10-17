@@ -69,8 +69,8 @@ public class GameDesktopLauncher implements ApplicationListener {
         trees = level.getObstacles();
         botTanks = level.getBots();
 
-        controller = new PlayerControl(new ControlButtons(UP,W,DOWN,S,LEFT,A,RIGHT,D));
-        botController = new BotControl();
+        controller = new PlayerControl(new ControlButtons(UP,W,DOWN,S,LEFT,A,RIGHT,D),level);
+        botController = new BotControl(level);
 
         setGraphics(playerTexturePath, obstacleTexturePath);
         setObstaclesAtTileCenter(groundLayer,trees);
@@ -98,12 +98,12 @@ public class GameDesktopLauncher implements ApplicationListener {
         controller.moveTank(player, level);
         // calculate interpolated player screen coordinates
         tileMovement.moveRectangleBetweenTileCenters(player.getGraphics(), player.getCurrentCoordinates(), player.getDestinationCoordinates(), player.getPlayerMovementProgress());
-        player.calculateMovementProgress(deltaTime,MOVEMENT_SPEED,level);
+        controller.calculateMovementProgress(player,deltaTime,MOVEMENT_SPEED);
 
         for (Tank bot : botTanks){
             botController.moveTank(bot,level);
             tileMovement.moveRectangleBetweenTileCenters(bot.getGraphics(), bot.getCurrentCoordinates(), bot.getDestinationCoordinates(), bot.getPlayerMovementProgress());
-            bot.calculateMovementProgress(deltaTime,MOVEMENT_SPEED,level);
+            botController.calculateMovementProgress(bot,deltaTime,MOVEMENT_SPEED);
         }
 
         renderObjects();
