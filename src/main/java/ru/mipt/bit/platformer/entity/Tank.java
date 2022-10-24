@@ -1,16 +1,13 @@
-package ru.mipt.bit.platformer;
+package ru.mipt.bit.platformer.entity;
 
 import com.badlogic.gdx.math.GridPoint2;
 import ru.mipt.bit.platformer.util.Graphics;
 import ru.mipt.bit.platformer.util.Rotation;
-import ru.mipt.bit.platformer.util.TileObject;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Random;
 
 import static com.badlogic.gdx.math.MathUtils.isEqual;
-import static ru.mipt.bit.platformer.util.GdxGameUtils.continueProgress;
 
 public class Tank {
     private Graphics graphics;

@@ -12,6 +12,17 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.math.Interpolation;
+import ru.mipt.bit.platformer.commands.Command;
+import ru.mipt.bit.platformer.control.BotControl;
+import ru.mipt.bit.platformer.control.ControlButtons;
+import ru.mipt.bit.platformer.control.IMoveControl;
+import ru.mipt.bit.platformer.control.PlayerControl;
+import ru.mipt.bit.platformer.entity.Level;
+import ru.mipt.bit.platformer.entity.Obstacle;
+import ru.mipt.bit.platformer.entity.Tank;
+import ru.mipt.bit.platformer.mapcreation.CreationMapParams;
+import ru.mipt.bit.platformer.mapcreation.ICreationMapStrategy;
+import ru.mipt.bit.platformer.mapcreation.ReadMapCreation;
 import ru.mipt.bit.platformer.util.*;
 
 import java.util.ArrayList;
@@ -46,7 +57,7 @@ public class GameDesktopLauncher implements ApplicationListener {
     IMoveControl botController;
 
     ICreationMapStrategy creationMapStrategy;
-
+    AIAdapter ai;
 
 
     @Override
@@ -69,8 +80,10 @@ public class GameDesktopLauncher implements ApplicationListener {
         trees = level.getObstacles();
         botTanks = level.getBots();
 
-        controller = new PlayerControl(new ControlButtons(UP,W,DOWN,S,LEFT,A,RIGHT,D),level);
-        botController = new BotControl(level);
+        controller = new PlayerControl(player,new ControlButtons(UP,W,DOWN,S,LEFT,A,RIGHT,D),level);
+        botController = new BotControl(botTanks,level);
+
+        ai = new AIAdapter(botTanks,player,trees,level);
 
         setGraphics(playerTexturePath, obstacleTexturePath);
         setObstaclesAtTileCenter(groundLayer,trees);
@@ -95,15 +108,20 @@ public class GameDesktopLauncher implements ApplicationListener {
         // get time passed since the last render
         float deltaTime = Gdx.graphics.getDeltaTime();
 
-        controller.moveTank(player, level);
+        Collection<Command> commands = ai.generateCommands();
+        for (Command cmd : commands){
+            cmd.execute();
+        }
+
+//        controller.handleCommands();
         // calculate interpolated player screen coordinates
         tileMovement.moveRectangleBetweenTileCenters(player.getGraphics(), player.getCurrentCoordinates(), player.getDestinationCoordinates(), player.getPlayerMovementProgress());
-        controller.calculateMovementProgress(player,deltaTime,MOVEMENT_SPEED);
+        controller.calculateMovementProgress(deltaTime,MOVEMENT_SPEED);
 
+//        botController.handleCommands();
+        botController.calculateMovementProgress(deltaTime,MOVEMENT_SPEED);
         for (Tank bot : botTanks){
-            botController.moveTank(bot,level);
             tileMovement.moveRectangleBetweenTileCenters(bot.getGraphics(), bot.getCurrentCoordinates(), bot.getDestinationCoordinates(), bot.getPlayerMovementProgress());
-            botController.calculateMovementProgress(bot,deltaTime,MOVEMENT_SPEED);
         }
 
         renderObjects();

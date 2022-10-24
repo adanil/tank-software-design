@@ -1,7 +1,7 @@
-package ru.mipt.bit.platformer.util;
+package ru.mipt.bit.platformer.mapcreation;
 
-import ru.mipt.bit.platformer.Obstacle;
-import ru.mipt.bit.platformer.Tank;
+import ru.mipt.bit.platformer.entity.Obstacle;
+import ru.mipt.bit.platformer.entity.Tank;
 
 import java.util.Collection;
 

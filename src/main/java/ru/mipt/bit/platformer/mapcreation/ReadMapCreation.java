@@ -1,8 +1,9 @@
-package ru.mipt.bit.platformer.util;
+package ru.mipt.bit.platformer.mapcreation;
 
 import com.badlogic.gdx.math.GridPoint2;
-import ru.mipt.bit.platformer.Obstacle;
-import ru.mipt.bit.platformer.Tank;
+import ru.mipt.bit.platformer.entity.Obstacle;
+import ru.mipt.bit.platformer.entity.Tank;
+import ru.mipt.bit.platformer.util.Rotation;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -30,7 +31,7 @@ public class ReadMapCreation implements ICreationMapStrategy{
                 if (ch.equals('T')){
                     obstacles.add(new Obstacle(new GridPoint2(x,y)));
                 } else if (ch.equals('X')) {
-                    player = new Tank(new GridPoint2(x,y),new GridPoint2(x,y),Rotation.RIGHT);
+                    player = new Tank(new GridPoint2(x,y),new GridPoint2(x,y), Rotation.RIGHT);
                 }
             }
         }

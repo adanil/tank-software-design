@@ -1,11 +1,11 @@
 package ru.tests;
 
 import org.junit.jupiter.api.Test;
-import ru.mipt.bit.platformer.Tank;
-import ru.mipt.bit.platformer.util.CreationMapParams;
-import ru.mipt.bit.platformer.util.ICreationMapStrategy;
-import ru.mipt.bit.platformer.util.RandomMapCreation;
-import ru.mipt.bit.platformer.util.ReadMapCreation;
+import ru.mipt.bit.platformer.entity.Tank;
+import ru.mipt.bit.platformer.mapcreation.CreationMapParams;
+import ru.mipt.bit.platformer.mapcreation.ICreationMapStrategy;
+import ru.mipt.bit.platformer.mapcreation.RandomMapCreation;
+import ru.mipt.bit.platformer.mapcreation.ReadMapCreation;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class CreationMapTest {

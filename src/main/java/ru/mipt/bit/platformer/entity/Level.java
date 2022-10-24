@@ -1,9 +1,8 @@
-package ru.mipt.bit.platformer;
+package ru.mipt.bit.platformer.entity;
 
 import com.badlogic.gdx.math.GridPoint2;
-import ru.mipt.bit.platformer.util.CreationMapParams;
-import ru.mipt.bit.platformer.util.ICreationMapStrategy;
-import ru.mipt.bit.platformer.util.TileObject;
+import ru.mipt.bit.platformer.mapcreation.CreationMapParams;
+import ru.mipt.bit.platformer.mapcreation.ICreationMapStrategy;
 
 import java.util.ArrayList;
 import java.util.Collection;

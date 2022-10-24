@@ -1,10 +1,7 @@
 package ru.tests;
-import com.badlogic.gdx.graphics.Texture;
-import org.junit.Before;
 import org.junit.jupiter.api.Test;
-import ru.mipt.bit.platformer.Obstacle;
+import ru.mipt.bit.platformer.entity.Obstacle;
 
-import java.io.IOException;
 import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.*;

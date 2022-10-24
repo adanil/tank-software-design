@@ -1,9 +1,6 @@
-package ru.mipt.bit.platformer;
+package ru.mipt.bit.platformer.entity;
 
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.GridPoint2;
-import com.badlogic.gdx.math.Rectangle;
 import ru.mipt.bit.platformer.util.Graphics;
 
 import java.util.ArrayList;

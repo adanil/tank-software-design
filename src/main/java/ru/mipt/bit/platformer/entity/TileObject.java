@@ -1,4 +1,4 @@
-package ru.mipt.bit.platformer.util;
+package ru.mipt.bit.platformer.entity;
 
 public enum TileObject {
     OBSTACLE,

@@ -1,7 +1,7 @@
 package ru.tests;
 
 import org.junit.jupiter.api.Test;
-import ru.mipt.bit.platformer.Tank;
+import ru.mipt.bit.platformer.entity.Tank;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
