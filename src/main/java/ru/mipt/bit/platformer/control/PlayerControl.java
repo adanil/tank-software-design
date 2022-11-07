@@ -3,10 +3,9 @@ package ru.mipt.bit.platformer.control;
 import com.badlogic.gdx.Gdx;
 import ru.mipt.bit.platformer.commands.Command;
 import ru.mipt.bit.platformer.commands.CommandGenerator;
-import ru.mipt.bit.platformer.entity.Level;
-import ru.mipt.bit.platformer.entity.Tank;
+import ru.mipt.bit.platformer.commands.Shoot;
+import ru.mipt.bit.platformer.entity.*;
 import ru.mipt.bit.platformer.commands.MoveCommand;
-import ru.mipt.bit.platformer.entity.TileObject;
 import ru.mipt.bit.platformer.util.*;
 
 import java.util.ArrayList;
@@ -44,7 +43,7 @@ public class PlayerControl implements IMoveControl, CommandGenerator {
 
     @Override
     public void handleCommands(){
-        Collection<Command> commands = generateCommands(player,level);
+        Collection<Command> commands = generateCommands(player, level);
         for (Command cmd : commands){
             cmd.execute();
         }
@@ -64,6 +63,9 @@ public class PlayerControl implements IMoveControl, CommandGenerator {
         }
         if (isButtonPressed(controlButtons.getRightButton1(), controlButtons.getRightButton2())) {
             commands.add(new MoveCommand(player,MoveVector.RIGHT,TileObject.PLAYER,level));
+        }
+        if (isButtonPressed(controlButtons.getShootButton(), controlButtons.getShootButton())){
+            commands.add(new Shoot(new Bullet(player),TileObject.BULLET,level));
         }
         return commands;
     }

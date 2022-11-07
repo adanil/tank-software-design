@@ -1,20 +1,15 @@
 package ru.mipt.bit.platformer;
 
-import com.badlogic.gdx.Input;
+import org.awesome.ai.AI;
 import org.awesome.ai.Recommendation;
 import org.awesome.ai.state.GameState;
 import org.awesome.ai.state.movable.Bot;
 import org.awesome.ai.state.movable.Orientation;
 import org.awesome.ai.state.movable.Player;
-import org.awesome.ai.strategy.NotRecommendingAI;
 import ru.mipt.bit.platformer.commands.Command;
-import ru.mipt.bit.platformer.commands.CommandGenerator;
 import ru.mipt.bit.platformer.commands.MoveCommand;
 import ru.mipt.bit.platformer.commands.Shoot;
-import ru.mipt.bit.platformer.entity.Level;
-import ru.mipt.bit.platformer.entity.Obstacle;
-import ru.mipt.bit.platformer.entity.Tank;
-import ru.mipt.bit.platformer.entity.TileObject;
+import ru.mipt.bit.platformer.entity.*;
 import ru.mipt.bit.platformer.util.MoveVector;
 
 import java.util.ArrayList;
@@ -22,14 +17,14 @@ import java.util.Collection;
 import java.util.List;
 
 public class AIAdapter {
-    NotRecommendingAI ai;
+    AI ai;
     Collection<Tank> enemies;
     Tank player;
     Collection<Obstacle> obstacles;
     Level level;
 
     public AIAdapter( Collection<Tank> enemies, Tank player, Collection<Obstacle> obstacles, Level level) {
-        ai = new NotRecommendingAI();
+        ai = new RandomRecommentingAI();
         this.enemies = enemies;
         this.player = player;
         this.obstacles = obstacles;
@@ -37,8 +32,8 @@ public class AIAdapter {
     }
 
     private GameState generateGameState(){
-        List<Bot> bots_adapted = new ArrayList<>();
-        List<org.awesome.ai.state.immovable.Obstacle> obstacle_adapted = new ArrayList<>();
+        List<Bot> botsAdapted = new ArrayList<>();
+        List<org.awesome.ai.state.immovable.Obstacle> obstacleAdapted = new ArrayList<>();
 
         Player.PlayerBuilder playerBuilder = Player.builder();
         playerBuilder.source(player);
@@ -64,7 +59,7 @@ public class AIAdapter {
                 break;
             }
         }
-        Player player_adapted = playerBuilder.build();
+        Player playerAdapted = playerBuilder.build();
 
 
         for (Tank tank : enemies){
@@ -92,20 +87,20 @@ public class AIAdapter {
                     break;
                 }
             }
-            bots_adapted.add(Bot.builder().build());
+            botsAdapted.add(botBuilder.build());
         }
 
         for (Obstacle obstacle : obstacles){
             org.awesome.ai.state.immovable.Obstacle o = new org.awesome.ai.state.immovable.Obstacle(obstacle.getCoordinates().x,obstacle.getCoordinates().y);
-            obstacle_adapted.add(o);
+            obstacleAdapted.add(o);
         }
 
 
         GameState.GameStateBuilder gmBuilder = GameState.builder();
 
-        gmBuilder.bots(bots_adapted);
-        gmBuilder.player(player_adapted);
-        gmBuilder.obstacles(obstacle_adapted);
+        gmBuilder.bots(botsAdapted);
+        gmBuilder.player(playerAdapted);
+        gmBuilder.obstacles(obstacleAdapted);
         gmBuilder.levelWidth(level.getWidth());
         gmBuilder.levelHeight(level.getHeight());
 
@@ -122,7 +117,7 @@ public class AIAdapter {
             if (rec.getActor().getSource() == player) {
                 switch (rec.getAction()) {
                     case Shoot: {
-                        commands.add(new Shoot());
+                        commands.add(new Shoot(new Bullet(player),TileObject.BULLET,level));
                         break;
                     }
                     case MoveEast: {
@@ -148,7 +143,7 @@ public class AIAdapter {
                     if (rec.getActor().getSource() == bot) {
                         switch (rec.getAction()) {
                             case Shoot: {
-                                commands.add(new Shoot());
+                                commands.add(new Shoot(new Bullet(bot),TileObject.BULLET,level));
                                 break;
                             }
                             case MoveEast: {

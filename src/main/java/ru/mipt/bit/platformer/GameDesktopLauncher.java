@@ -14,12 +14,10 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.math.Interpolation;
 import ru.mipt.bit.platformer.commands.Command;
 import ru.mipt.bit.platformer.control.BotControl;
+import ru.mipt.bit.platformer.control.BulletControl;
 import ru.mipt.bit.platformer.control.ControlButtons;
-import ru.mipt.bit.platformer.control.IMoveControl;
 import ru.mipt.bit.platformer.control.PlayerControl;
-import ru.mipt.bit.platformer.entity.Level;
-import ru.mipt.bit.platformer.entity.Obstacle;
-import ru.mipt.bit.platformer.entity.Tank;
+import ru.mipt.bit.platformer.entity.*;
 import ru.mipt.bit.platformer.mapcreation.CreationMapParams;
 import ru.mipt.bit.platformer.mapcreation.ICreationMapStrategy;
 import ru.mipt.bit.platformer.mapcreation.ReadMapCreation;
@@ -27,6 +25,7 @@ import ru.mipt.bit.platformer.util.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 
 import static com.badlogic.gdx.math.MathUtils.isEqual;
 import static ru.mipt.bit.platformer.util.GdxGameUtils.*;
@@ -39,22 +38,15 @@ public class GameDesktopLauncher implements ApplicationListener {
     public static final String obstacleTexturePath = "images/greenTree.png";
     public static final String mapFilePath = "src/main/resources/levels/level1";
 
-    private Batch batch;
-
-    private TiledMap levelGraphic;
-    private MapRenderer levelRenderer;
-    private IMoveRectangle tileMovement;
-
-    Collection<Obstacle> trees;
-
-    Tank player;
-
-    ArrayList<Tank> botTanks;
 
     Level level;
 
-    IMoveControl controller;
-    IMoveControl botController;
+    GraphicalLevel graphicalLevel;
+
+    PlayerControl playerControl;
+    BotControl botController;
+
+    BulletControl bulletControl;
 
     ICreationMapStrategy creationMapStrategy;
     AIAdapter ai;
@@ -62,93 +54,73 @@ public class GameDesktopLauncher implements ApplicationListener {
 
     @Override
     public void create() {
-        batch = new SpriteBatch();
+        Batch batch = new SpriteBatch();
 
         // load level tiles
-        levelGraphic = new TmxMapLoader().load("level.tmx");
-        levelRenderer = createSingleLayerMapRenderer(levelGraphic, batch);
+        TiledMap levelGraphic = new TmxMapLoader().load("level.tmx");
+        MapRenderer levelRenderer = createSingleLayerMapRenderer(levelGraphic, batch);
         TiledMapTileLayer groundLayer = getSingleLayer(levelGraphic);
+        TileMovement tileMovement = new TileMovement(groundLayer, Interpolation.smooth);
 
-        tileMovement = new TileMovement(groundLayer, Interpolation.smooth);
-
+        //Create logical level
         creationMapStrategy = new ReadMapCreation();
         CreationMapParams mapParams = new CreationMapParams(mapFilePath,groundLayer.getWidth(),groundLayer.getHeight());
         level = new Level(groundLayer.getWidth(),groundLayer.getHeight());
-        level.createLevel(creationMapStrategy,mapParams);
+        level.createLevel(creationMapStrategy,mapParams, 5);
 
-        player = level.getPlayer();
-        trees = level.getObstacles();
-        botTanks = level.getBots();
+        //Create graphical level
+        graphicalLevel = new GraphicalLevel(level,batch,tileMovement,levelRenderer,levelGraphic);
+        level.subscribe(graphicalLevel);
 
-        controller = new PlayerControl(player,new ControlButtons(UP,W,DOWN,S,LEFT,A,RIGHT,D),level);
+        Tank player = level.getPlayer();
+        Collection<Obstacle> trees = level.getObstacles();
+        Collection<Tank> botTanks = level.getBots();
+
+        playerControl = new PlayerControl(player,new ControlButtons(UP,W,DOWN,S,LEFT,A,RIGHT,D,SPACE),level);
         botController = new BotControl(botTanks,level);
+        bulletControl = new BulletControl(level);
 
         ai = new AIAdapter(botTanks,player,trees,level);
 
-        setGraphics(playerTexturePath, obstacleTexturePath);
+        graphicalLevel.setGraphics(playerTexturePath, obstacleTexturePath);
         setObstaclesAtTileCenter(groundLayer,trees);
     }
 
-    private void setGraphics(String playerTexturePath, String obstacleTexturePath) {
-        player.setGraphics(new Graphics(new Texture(playerTexturePath)));
 
-        for (Tank bot : botTanks){
-            bot.setGraphics(new Graphics(new Texture(playerTexturePath)));
-        }
-
-        for (Obstacle tree : trees){
-            tree.setGraphics(new Graphics(new Texture(obstacleTexturePath)));
-        }
-    }
 
     @Override
     public void render() {
         clearWindow();
 
-        // get time passed since the last render
-        float deltaTime = Gdx.graphics.getDeltaTime();
+        executeCommands();
 
+        live();
+
+        graphicalLevel.renderObjects();
+    }
+
+    private void executeCommands() {
         Collection<Command> commands = ai.generateCommands();
         for (Command cmd : commands){
             cmd.execute();
         }
 
-//        controller.handleCommands();
-        // calculate interpolated player screen coordinates
-        tileMovement.moveRectangleBetweenTileCenters(player.getGraphics(), player.getCurrentCoordinates(), player.getDestinationCoordinates(), player.getPlayerMovementProgress());
-        controller.calculateMovementProgress(deltaTime,MOVEMENT_SPEED);
+        playerControl.handleCommands();
+    }
 
-//        botController.handleCommands();
+    public void live(){
+        // get time passed since the last render
+        float deltaTime = Gdx.graphics.getDeltaTime();
+
+        playerControl.calculateMovementProgress(deltaTime,MOVEMENT_SPEED);
+
         botController.calculateMovementProgress(deltaTime,MOVEMENT_SPEED);
-        for (Tank bot : botTanks){
-            tileMovement.moveRectangleBetweenTileCenters(bot.getGraphics(), bot.getCurrentCoordinates(), bot.getDestinationCoordinates(), bot.getPlayerMovementProgress());
-        }
 
-        renderObjects();
+        bulletControl.calculateMovementProgress(deltaTime,MOVEMENT_SPEED);
+
     }
 
-    private void renderObjects() {
-        // render each tile of the level
-        levelRenderer.render();
 
-        // start recording all drawing commands
-        batch.begin();
-
-        // render player
-        drawTextureRegionUnscaled(batch, player.getGraphics(), player.getRotation().value);
-
-        for (Tank bot : botTanks){
-            drawTextureRegionUnscaled(batch,bot.getGraphics(),bot.getRotation().value);
-        }
-
-        // render tree obstacle
-        for (Obstacle tree : trees) {
-            drawTextureRegionUnscaled(batch, tree.getGraphics(), 0f);
-        }
-
-        // submit all drawing requests
-        batch.end();
-    }
 
     private void setObstaclesAtTileCenter(TiledMapTileLayer groundLayer,Collection<Obstacle> obstacles) {
         for (Obstacle obstacle : obstacles) {
@@ -173,17 +145,7 @@ public class GameDesktopLauncher implements ApplicationListener {
 
     @Override
     public void dispose() {
-        // dispose of all the native resources (classes which implement com.badlogic.gdx.utils.Disposable)
-        for (Obstacle tree : trees) {
-            tree.getGraphics().getTexture().dispose();
-        }
-
-        for (Tank bot : botTanks){
-            bot.getGraphics().getTexture().dispose();
-        }
-        player.getGraphics().getTexture().dispose();
-        levelGraphic.dispose();
-        batch.dispose();
+        graphicalLevel.dispose();
     }
 
     public static void main(String[] args) {

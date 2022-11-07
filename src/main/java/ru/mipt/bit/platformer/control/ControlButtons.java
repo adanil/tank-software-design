@@ -16,8 +16,9 @@ public class ControlButtons {
 
     private final int rightButton1;
     private final int rightButton2;
+    private final int shootButton;
 
-    public ControlButtons(int upButton1, int upButton2, int downButton1, int downButton2, int leftButton1, int leftButton2, int rightButton1, int rightButton2) {
+    public ControlButtons(int upButton1, int upButton2, int downButton1, int downButton2, int leftButton1, int leftButton2, int rightButton1, int rightButton2, int shootButton) {
         this.upButton1 = upButton1;
         this.upButton2 = upButton2;
         this.downButton1 = downButton1;
@@ -26,6 +27,7 @@ public class ControlButtons {
         this.leftButton2 = leftButton2;
         this.rightButton1 = rightButton1;
         this.rightButton2 = rightButton2;
+        this.shootButton = shootButton;
     }
 
     public int getUpButton1() {
@@ -58,5 +60,8 @@ public class ControlButtons {
 
     public int getRightButton2() {
         return rightButton2;
+    }
+    public int getShootButton() {
+        return shootButton;
     }
 }

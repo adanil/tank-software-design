@@ -9,54 +9,55 @@ import java.util.Random;
 
 import static com.badlogic.gdx.math.MathUtils.isEqual;
 
-public class Tank {
+public class Tank implements IMoveable{
     private Graphics graphics;
-
     private Rotation rotation;
     private GridPoint2 currentCoordinates;
     private GridPoint2 destinationCoordinates;
     private float playerMovementProgress;
+    private int health;
+    public Tank(GridPoint2 destinationCoordinates, GridPoint2 currentCoordinates, Rotation rotation) {
+        this.destinationCoordinates = destinationCoordinates;
+        this.currentCoordinates = currentCoordinates;
+        this.rotation = rotation;
+        this.playerMovementProgress = 1f;
+        this.health = 2;
+    }
+
+    static public Tank createPlayerWithRandomPos(int levelWidth, int levelHeight){
+        Random ran = new Random();
+        int x = ran.nextInt(levelWidth - 1) + 1;
+        int y = ran.nextInt(levelHeight - 1) + 1;
+        GridPoint2 coords = new GridPoint2(x,y);
+        return new Tank(coords,coords,Rotation.RIGHT);
+    }
+
+    static public ArrayList<Tank> generateBotTanks(Level level,int botsCount){
+        ArrayList<Tank> bots = new ArrayList<>();
+        int created = 0;
+        while (created < botsCount){
+            Random ran = new Random();
+            int x = ran.nextInt(level.getWidth() - 1) + 1;
+            int y = ran.nextInt(level.getHeight() - 1) + 1;
+
+            if (level.getObjectByCoords(x,y) != TileObject.FREE)
+                continue;
+
+            int rot = ran.nextInt(4);
+            GridPoint2 coords = new GridPoint2(x,y);
+            bots.add(new Tank(coords,coords,Rotation.values()[rot]));
+            created++;
+        }
+        return bots;
+
+    }
+
     public Graphics getGraphics() {
         return graphics;
     }
 
     public void setGraphics(Graphics graphics) {
         this.graphics = graphics;
-    }
-
-    public void currentCoordinatesIncrementX(){
-        currentCoordinates.x++;
-    }
-    public void currentCoordinatesIncrementY(){
-        currentCoordinates.y++;
-    }
-
-    public void currentCoordinatesDecrementX(){
-        currentCoordinates.x--;
-    }
-    public void currentCoordinatesDecrementY(){
-        currentCoordinates.y--;
-    }
-
-    public void destinationCoordinatesIncrementX(){
-        destinationCoordinates.x++;
-    }
-    public void destinationCoordinatesIncrementY(){
-        destinationCoordinates.y++;
-    }
-
-    public void destinationCoordinatesDecrementX(){
-        destinationCoordinates.x--;
-    }
-    public void destinationCoordinatesDecrementY(){
-        destinationCoordinates.y--;
-    }
-
-    public Tank(GridPoint2 destinationCoordinates, GridPoint2 currentCoordinates, Rotation rotation) {
-        this.destinationCoordinates = destinationCoordinates;
-        this.currentCoordinates = currentCoordinates;
-        this.rotation = rotation;
-        this.playerMovementProgress = 1f;
     }
 
     public Rotation getRotation() {
@@ -90,34 +91,12 @@ public class Tank {
     public void setPlayerMovementProgress(float playerMovementProgress) {
         this.playerMovementProgress = playerMovementProgress;
     }
-    
 
-
-    static public Tank createPlayerWithRandomPos(int levelWidth, int levelHeight){
-        Random ran = new Random();
-        int x = ran.nextInt(levelWidth - 1) + 1;
-        int y = ran.nextInt(levelHeight - 1) + 1;
-        GridPoint2 coords = new GridPoint2(x,y);
-        return new Tank(coords,coords,Rotation.RIGHT);
+    public int getHealth() {
+        return health;
     }
 
-    static public ArrayList<Tank> generateBotTanks(Level level,int botsCount){
-        ArrayList<Tank> bots = new ArrayList<>();
-        int created = 0;
-        while (created < botsCount){
-            Random ran = new Random();
-            int x = ran.nextInt(level.getWidth() - 1) + 1;
-            int y = ran.nextInt(level.getHeight() - 1) + 1;
-
-            if (level.getObjectByCoords(x,y) != TileObject.FREE)
-                continue;
-
-            int rot = ran.nextInt(4);
-            GridPoint2 coords = new GridPoint2(x,y);
-            bots.add(new Tank(coords,coords,Rotation.values()[rot]));
-            created++;
-        }
-        return bots;
-
+    public void setHealth(int health) {
+        this.health = health;
     }
 }

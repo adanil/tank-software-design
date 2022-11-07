@@ -4,5 +4,6 @@ public enum TileObject {
     OBSTACLE,
     PLAYER,
     BOT,
+    BULLET,
     FREE;
 }
