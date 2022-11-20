@@ -11,6 +11,9 @@ import java.util.HashSet;
 import static com.badlogic.gdx.math.MathUtils.isEqual;
 import static ru.mipt.bit.platformer.util.GdxGameUtils.continueProgress;
 
+/*
+* Port?
+*/
 public class BulletControl implements IMoveControl{
     Level level;
     public BulletControl(Level level){

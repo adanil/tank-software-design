@@ -14,6 +14,9 @@ import java.util.HashMap;
 import static com.badlogic.gdx.math.MathUtils.isEqual;
 import static ru.mipt.bit.platformer.util.GdxGameUtils.continueProgress;
 
+/*
+ * Port
+*/
 public class PlayerControl implements IMoveControl, CommandGenerator {
     ControlButtons controlButtons;
     Level level;

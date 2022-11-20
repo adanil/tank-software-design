@@ -6,7 +6,9 @@ import ru.mipt.bit.platformer.entity.Tank;
 
 import static com.badlogic.gdx.math.MathUtils.isEqual;
 import static ru.mipt.bit.platformer.util.GdxGameUtils.continueProgress;
-
+/*
+ * Adapter
+ */
 public class MediumState extends TankState{
     public MediumState(Tank tank) {
         super(tank);

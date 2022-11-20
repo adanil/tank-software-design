@@ -14,6 +14,9 @@ import java.util.HashSet;
 
 import static ru.mipt.bit.platformer.util.GdxGameUtils.drawTextureRegionUnscaled;
 
+/*
+* Adapter
+*/
 public class GraphicalLevel implements IGraphics{
     Level logicalLevel;
     Batch batch;

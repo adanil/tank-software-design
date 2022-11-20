@@ -12,6 +12,9 @@ import java.util.HashSet;
 
 import static com.badlogic.gdx.math.MathUtils.isEqual;
 
+/*
+ * Adapter
+ */
 public class Shoot implements Command {
     Bullet bullet;
     final TileObject objectType = TileObject.BULLET;

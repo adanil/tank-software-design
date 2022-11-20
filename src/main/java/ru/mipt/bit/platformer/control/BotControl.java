@@ -14,6 +14,9 @@ import java.util.Random;
 import static com.badlogic.gdx.math.MathUtils.isEqual;
 import static ru.mipt.bit.platformer.util.GdxGameUtils.continueProgress;
 
+/*
+* Port?
+*/
 public class BotControl implements IMoveControl, CommandGenerator {
     Level level;
 

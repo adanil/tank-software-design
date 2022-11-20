@@ -30,6 +30,9 @@ import static com.badlogic.gdx.math.MathUtils.isEqual;
 import static ru.mipt.bit.platformer.util.GdxGameUtils.*;
 import static com.badlogic.gdx.Input.Keys.*;
 
+/*
+ * Port
+ */
 public class GameDesktopLauncher implements ApplicationListener {
 
     private static final float MOVEMENT_SPEED = 0.4f;

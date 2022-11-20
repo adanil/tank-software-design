@@ -11,6 +11,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
+/*
+ * Adapter
+ */
 public class ReadMapCreation implements ICreationMapStrategy{
     Tank player;
     Collection<Obstacle> obstacles;

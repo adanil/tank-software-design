@@ -8,6 +8,9 @@ import ru.mipt.bit.platformer.entity.TileObject;
 
 import static com.badlogic.gdx.math.MathUtils.isEqual;
 
+/*
+ * Adapter
+ */
 public class MoveCommand implements Command {
     Tank tank;
     MoveVector moveVector;

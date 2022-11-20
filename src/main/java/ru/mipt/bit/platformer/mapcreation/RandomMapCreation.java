@@ -5,6 +5,9 @@ import ru.mipt.bit.platformer.entity.Tank;
 
 import java.util.Collection;
 
+/*
+* Adapter
+*/
 public class RandomMapCreation implements ICreationMapStrategy{
     Tank player;
     Collection<Obstacle> obstacles;

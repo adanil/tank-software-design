@@ -5,6 +5,10 @@ import ru.mipt.bit.platformer.entity.Tank;
 
 import java.util.Collection;
 
+
+/*
+* Port
+*/
 public interface ICreationMapStrategy {
 
     void createMap(CreationMapParams params);

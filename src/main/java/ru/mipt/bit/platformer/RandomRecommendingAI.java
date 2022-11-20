@@ -10,6 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+/*
+ * Adapter
+ */
 public class RandomRecommendingAI implements AI {
 
     @Override

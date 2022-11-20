@@ -10,6 +10,9 @@ import ru.mipt.bit.platformer.util.TileMovement;
 
 import java.util.ArrayList;
 
+/*
+ * Adapter
+ */
 public class ShowHealthCommand implements Command{
     GraphicPointer graphicalLevel;
     Level level;

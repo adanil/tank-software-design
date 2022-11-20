@@ -10,6 +10,9 @@ import java.util.Collection;
 import static com.badlogic.gdx.math.MathUtils.isEqual;
 import static ru.mipt.bit.platformer.util.GdxGameUtils.continueProgress;
 
+/*
+ * Adapter
+ */
 public class LightState extends TankState{
     public LightState(Tank tank) {
         super(tank);
