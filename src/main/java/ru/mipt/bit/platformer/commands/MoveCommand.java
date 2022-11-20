@@ -24,7 +24,7 @@ public class MoveCommand implements Command {
     @Override
     public void execute() {
         if (isEqual(tank.getPlayerMovementProgress(), 1f)) {
-            GridPoint2 playerDestCoords = tank.getDestinationCoordinates().cpy().add(moveVector.vector);
+            GridPoint2 playerDestCoords = tank.getCurrentCoordinates().cpy().add(moveVector.vector);
             // check potential player destination for collision with obstacles
             if (!level.checkCollision(playerDestCoords)) {
                 tank.setDestinationCoordinates(playerDestCoords);

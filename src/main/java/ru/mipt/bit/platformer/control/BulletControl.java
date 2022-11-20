@@ -1,6 +1,5 @@
 package ru.mipt.bit.platformer.control;
 
-import org.awesome.ai.state.movable.Player;
 import ru.mipt.bit.platformer.entity.Bullet;
 import ru.mipt.bit.platformer.entity.Level;
 import ru.mipt.bit.platformer.entity.Tank;
@@ -26,23 +25,29 @@ public class BulletControl implements IMoveControl{
             if (isEqual(bullet.getBulletMovementProgress(), 1f)) {
                 if (!bullet.getDestinationCoordinates().equals(bullet.getCurrentCoordinates()))
                     level.clearTile(bullet.getCurrentCoordinates());
-                bullet.setCurrentCoordinates(bullet.getDestinationCoordinates());
+                bullet.setCurrentCoordinates(bullet.getDestinationCoordinates().cpy());
                 bullet.calcDestCoords();
                 bullet.setBulletMovementProgress(0);
 
-                TileObject tileObject = level.getObjectByCoords(bullet.getCurrentCoordinates().x,bullet.getCurrentCoordinates().y);
-                if (tileObject == TileObject.PLAYER){
+                HashSet<TileObject> tileObjects = level.checkCollisionBullet(bullet.getDestinationCoordinates());
+                if (tileObjects.contains(TileObject.PLAYER)){
                     Tank player = level.getPlayer();
-                    player.setHealth(player.getHealth() - 1);
+                    if (bullet.getSource() != player) {
+                        player.updateHealth(player.getHealth() - 1);
+                        toRemove.add(bullet);
+                    }
                 }
-                else if (tileObject == TileObject.BOT){
+                else if (tileObjects.contains(TileObject.BOT)){
                     ArrayList<Tank> bots = level.getBots();
                     ArrayList<Tank> botsToRemove = new ArrayList<>();
                     for (Tank bot : bots){
                         if (bot.getCurrentCoordinates().equals(bullet.getDestinationCoordinates())) {
-                            bot.setHealth(bot.getHealth() - 1);
-                            if (bot.getHealth() == 0)
-                                botsToRemove.add(bot);
+                            if (bullet.getSource() != bot) {
+                                bot.updateHealth(bot.getHealth() - 1);
+                                toRemove.add(bullet);
+                                if (bot.getHealth() == 0)
+                                    botsToRemove.add(bot);
+                            }
                         }
                     }
                     for (Tank bot : botsToRemove){
@@ -50,7 +55,7 @@ public class BulletControl implements IMoveControl{
                     }
                 }
 
-                if (level.checkCollision(bullet.getDestinationCoordinates())) {
+                if (tileObjects.contains(TileObject.OBSTACLE)) {
                     toRemove.add(bullet);
                 }
 

@@ -7,6 +7,7 @@ import org.awesome.ai.state.movable.Bot;
 import org.awesome.ai.state.movable.Orientation;
 import org.awesome.ai.state.movable.Player;
 import ru.mipt.bit.platformer.commands.Command;
+import ru.mipt.bit.platformer.commands.CommandType;
 import ru.mipt.bit.platformer.commands.MoveCommand;
 import ru.mipt.bit.platformer.commands.Shoot;
 import ru.mipt.bit.platformer.entity.*;
@@ -24,7 +25,7 @@ public class AIAdapter {
     Level level;
 
     public AIAdapter( Collection<Tank> enemies, Tank player, Collection<Obstacle> obstacles, Level level) {
-        ai = new RandomRecommentingAI();
+        ai = new RandomRecommendingAI();
         this.enemies = enemies;
         this.player = player;
         this.obstacles = obstacles;
@@ -117,23 +118,28 @@ public class AIAdapter {
             if (rec.getActor().getSource() == player) {
                 switch (rec.getAction()) {
                     case Shoot: {
-                        commands.add(new Shoot(new Bullet(player),TileObject.BULLET,level));
+                        if (player.validateCommand(CommandType.SHOOT))
+                            commands.add(new Shoot(new Bullet(player), level, player));
                         break;
                     }
                     case MoveEast: {
-                        commands.add(new MoveCommand(player,MoveVector.RIGHT, TileObject.PLAYER,level));
+                        if (player.validateCommand(CommandType.MOVE))
+                            commands.add(new MoveCommand(player,MoveVector.RIGHT, TileObject.PLAYER,level));
                         break;
                     }
                     case MoveWest: {
-                        commands.add(new MoveCommand(player,MoveVector.LEFT, TileObject.PLAYER,level));
+                        if (player.validateCommand(CommandType.MOVE))
+                            commands.add(new MoveCommand(player,MoveVector.LEFT, TileObject.PLAYER,level));
                         break;
                     }
                     case MoveNorth: {
-                        commands.add(new MoveCommand(player,MoveVector.UP, TileObject.PLAYER,level));
+                        if (player.validateCommand(CommandType.MOVE))
+                            commands.add(new MoveCommand(player,MoveVector.UP, TileObject.PLAYER,level));
                         break;
                     }
                     case MoveSouth: {
-                        commands.add(new MoveCommand(player,MoveVector.DOWN, TileObject.PLAYER,level));
+                        if (player.validateCommand(CommandType.MOVE))
+                            commands.add(new MoveCommand(player,MoveVector.DOWN, TileObject.PLAYER,level));
                         break;
                     }
                 }
@@ -143,23 +149,28 @@ public class AIAdapter {
                     if (rec.getActor().getSource() == bot) {
                         switch (rec.getAction()) {
                             case Shoot: {
-                                commands.add(new Shoot(new Bullet(bot),TileObject.BULLET,level));
+                                if (bot.validateCommand(CommandType.SHOOT))
+                                    commands.add(new Shoot(new Bullet(bot), level,bot));
                                 break;
                             }
                             case MoveEast: {
-                                commands.add(new MoveCommand(bot,MoveVector.RIGHT, TileObject.BOT,level));
+                                if (bot.validateCommand(CommandType.MOVE))
+                                    commands.add(new MoveCommand(bot,MoveVector.RIGHT, TileObject.BOT,level));
                                 break;
                             }
                             case MoveWest: {
-                                commands.add(new MoveCommand(bot,MoveVector.LEFT, TileObject.BOT,level));
+                                if (bot.validateCommand(CommandType.MOVE))
+                                    commands.add(new MoveCommand(bot,MoveVector.LEFT, TileObject.BOT,level));
                                 break;
                             }
                             case MoveNorth: {
-                                commands.add(new MoveCommand(bot,MoveVector.UP, TileObject.BOT,level));
+                                if (bot.validateCommand(CommandType.MOVE))
+                                    commands.add(new MoveCommand(bot,MoveVector.UP, TileObject.BOT,level));
                                 break;
                             }
                             case MoveSouth: {
-                                commands.add(new MoveCommand(bot,MoveVector.DOWN, TileObject.BOT,level));
+                                if (bot.validateCommand(CommandType.MOVE))
+                                    commands.add(new MoveCommand(bot,MoveVector.DOWN, TileObject.BOT,level));
                                 break;
                             }
                         }

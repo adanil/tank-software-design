@@ -1,9 +1,10 @@
-package ru.mipt.bit.platformer.entity;
+package ru.mipt.bit.platformer.graphics;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.maps.MapRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
+import ru.mipt.bit.platformer.entity.*;
 import ru.mipt.bit.platformer.util.Graphics;
 import ru.mipt.bit.platformer.util.IMoveRectangle;
 
@@ -13,7 +14,7 @@ import java.util.HashSet;
 
 import static ru.mipt.bit.platformer.util.GdxGameUtils.drawTextureRegionUnscaled;
 
-public class GraphicalLevel implements IEventListener{
+public class GraphicalLevel implements IGraphics{
     Level logicalLevel;
     Batch batch;
     IMoveRectangle tileMovement;
@@ -23,13 +24,20 @@ public class GraphicalLevel implements IEventListener{
     Collection<Obstacle> trees;
     ArrayList<Tank> botTanks;
     HashSet<Bullet> bullets;
+    String playerTexturePath;
+    String obstacleTexturePath;
 
-    public GraphicalLevel(Level logicalLevel, Batch batch, IMoveRectangle tileMovement, MapRenderer levelRenderer, TiledMap levelGraphic) {
+//    Collection<RenderObject> renderObjects;
+
+    public GraphicalLevel(Level logicalLevel, Batch batch, IMoveRectangle tileMovement, MapRenderer levelRenderer, TiledMap levelGraphic, String playerTexturePath,String obstacleTexturePath) {
         this.logicalLevel = logicalLevel;
         this.batch = batch;
         this.tileMovement = tileMovement;
         this.levelRenderer = levelRenderer;
         this.levelGraphic = levelGraphic;
+        this.playerTexturePath = playerTexturePath;
+        this.obstacleTexturePath = obstacleTexturePath;
+//        renderObjects = new ArrayList<>();
     }
 
     @Override
@@ -38,9 +46,12 @@ public class GraphicalLevel implements IEventListener{
         this.trees = logicalLevel.getObstacles();
         this.botTanks = logicalLevel.getBots();
         this.bullets = logicalLevel.getBullets();
+
+        setGraphics();
+
     }
 
-    public void setGraphics(String playerTexturePath, String obstacleTexturePath) {
+    public void setGraphics() {
         player.setGraphics(new Graphics(new Texture(playerTexturePath)));
 
         for (Tank bot : botTanks){
@@ -52,42 +63,35 @@ public class GraphicalLevel implements IEventListener{
         }
     }
 
-    public void renderObjects() {
+    public void renderObjects(Collection<RenderObject> renderObjects) {
+        renderObjects.add(new RenderObject(player.getGraphics(),player.getCurrentCoordinates(),player.getDestinationCoordinates(),player.getPlayerMovementProgress(),player.getRotation().value));
+        for (Obstacle tree : trees){
+            renderObjects.add(new RenderObject(tree.getGraphics(),tree.getCoordinates(),tree.getCoordinates(),0,0f));
+        }
         for (Tank bot : botTanks){
-            tileMovement.moveRectangleBetweenTileCenters(bot.getGraphics(), bot.getCurrentCoordinates(), bot.getDestinationCoordinates(), bot.getPlayerMovementProgress());
+            renderObjects.add(new RenderObject(bot.getGraphics(),bot.getCurrentCoordinates(),bot.getDestinationCoordinates(),bot.getPlayerMovementProgress(),bot.getRotation().value));
         }
         for (Bullet bullet : bullets){
-            tileMovement.moveRectangleBetweenTileCenters(bullet.getGraphics(),bullet.getCurrentCoordinates(),bullet.getDestinationCoordinates(), bullet.getBulletMovementProgress());
+            renderObjects.add(new RenderObject(bullet.getGraphics(),bullet.getCurrentCoordinates(),bullet.getDestinationCoordinates(),bullet.getBulletMovementProgress(),bullet.getRotation().value));
         }
-        // calculate interpolated player screen coordinates
-        tileMovement.moveRectangleBetweenTileCenters(player.getGraphics(), player.getCurrentCoordinates(), player.getDestinationCoordinates(), player.getPlayerMovementProgress());
 
-        // render each tile of the level
+
+        for (RenderObject obj : renderObjects){
+            tileMovement.moveRectangleBetweenTileCenters(obj.getGraphics(),obj.getCurrentCoordinates(),obj.getDestCoordinates(),obj.getMovementProgress());
+        }
+
         levelRenderer.render();
 
         // start recording all drawing commands
         batch.begin();
 
-        // render player
-        drawTextureRegionUnscaled(batch, player.getGraphics(), player.getRotation().value);
-
-        for (Tank bot : botTanks){
-            drawTextureRegionUnscaled(batch,bot.getGraphics(),bot.getRotation().value);
+        for (RenderObject obj : renderObjects){
+            drawTextureRegionUnscaled(batch,obj.getGraphics(),obj.getRotation());
         }
-
-        // render tree obstacle
-        for (Obstacle tree : trees) {
-            drawTextureRegionUnscaled(batch, tree.getGraphics(), 0f);
-        }
-
-        //render bullets
-
-        for (Bullet bullet : bullets){
-            drawTextureRegionUnscaled(batch,bullet.getGraphics(),bullet.getRotation().value);
-        }
-
         // submit all drawing requests
         batch.end();
+        renderObjects.clear();
+
     }
 
     public void dispose(){

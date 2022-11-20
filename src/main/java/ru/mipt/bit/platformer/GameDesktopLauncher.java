@@ -4,7 +4,6 @@ import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.MapRenderer;
@@ -18,6 +17,7 @@ import ru.mipt.bit.platformer.control.BulletControl;
 import ru.mipt.bit.platformer.control.ControlButtons;
 import ru.mipt.bit.platformer.control.PlayerControl;
 import ru.mipt.bit.platformer.entity.*;
+import ru.mipt.bit.platformer.graphics.*;
 import ru.mipt.bit.platformer.mapcreation.CreationMapParams;
 import ru.mipt.bit.platformer.mapcreation.ICreationMapStrategy;
 import ru.mipt.bit.platformer.mapcreation.ReadMapCreation;
@@ -25,7 +25,6 @@ import ru.mipt.bit.platformer.util.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 
 import static com.badlogic.gdx.math.MathUtils.isEqual;
 import static ru.mipt.bit.platformer.util.GdxGameUtils.*;
@@ -41,7 +40,7 @@ public class GameDesktopLauncher implements ApplicationListener {
 
     Level level;
 
-    GraphicalLevel graphicalLevel;
+    GraphicPointer graphicalLevel;
 
     PlayerControl playerControl;
     BotControl botController;
@@ -62,27 +61,31 @@ public class GameDesktopLauncher implements ApplicationListener {
         TiledMapTileLayer groundLayer = getSingleLayer(levelGraphic);
         TileMovement tileMovement = new TileMovement(groundLayer, Interpolation.smooth);
 
+
         //Create logical level
         creationMapStrategy = new ReadMapCreation();
         CreationMapParams mapParams = new CreationMapParams(mapFilePath,groundLayer.getWidth(),groundLayer.getHeight());
         level = new Level(groundLayer.getWidth(),groundLayer.getHeight());
-        level.createLevel(creationMapStrategy,mapParams, 5);
+        level.createLevel(creationMapStrategy,mapParams, 2);
 
+        graphicalLevel = new GraphicPointer();
         //Create graphical level
-        graphicalLevel = new GraphicalLevel(level,batch,tileMovement,levelRenderer,levelGraphic);
-        level.subscribe(graphicalLevel);
+        graphicalLevel.setSource(new GraphicalLevel(level,batch,tileMovement,levelRenderer,levelGraphic,playerTexturePath,obstacleTexturePath));
+        level.subscribe(graphicalLevel.getSource());
+
+        GraphicsParams graphicsParams = new GraphicsParams(graphicalLevel,level,batch,tileMovement,levelRenderer,levelGraphic,playerTexturePath,obstacleTexturePath);
+
 
         Tank player = level.getPlayer();
         Collection<Obstacle> trees = level.getObstacles();
         Collection<Tank> botTanks = level.getBots();
 
-        playerControl = new PlayerControl(player,new ControlButtons(UP,W,DOWN,S,LEFT,A,RIGHT,D,SPACE),level);
+        playerControl = new PlayerControl(player,new ControlButtons(UP,W,DOWN,S,LEFT,A,RIGHT,D,SPACE,L),level,graphicsParams);
         botController = new BotControl(botTanks,level);
         bulletControl = new BulletControl(level);
 
         ai = new AIAdapter(botTanks,player,trees,level);
 
-        graphicalLevel.setGraphics(playerTexturePath, obstacleTexturePath);
         setObstaclesAtTileCenter(groundLayer,trees);
     }
 
@@ -96,7 +99,7 @@ public class GameDesktopLauncher implements ApplicationListener {
 
         live();
 
-        graphicalLevel.renderObjects();
+        graphicalLevel.getSource().renderObjects(new ArrayList<RenderObject>());
     }
 
     private void executeCommands() {
@@ -145,7 +148,7 @@ public class GameDesktopLauncher implements ApplicationListener {
 
     @Override
     public void dispose() {
-        graphicalLevel.dispose();
+        graphicalLevel.getSource().dispose();
     }
 
     public static void main(String[] args) {

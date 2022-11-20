@@ -18,6 +18,8 @@ public class Bullet implements IMoveable{
     private GridPoint2 destinationCoordinates;
     private float bulletMovementProgress;
 
+    private Tank source;
+
     public Graphics getGraphics() {
         return graphics;
     }
@@ -30,11 +32,12 @@ public class Bullet implements IMoveable{
         this.destinationCoordinates = destinationCoordinates;
         this.currentCoordinates = currentCoordinates;
         this.rotation = rotation;
-        this.bulletMovementProgress = 1f;
+        this.bulletMovementProgress = 0f;
     }
     public Bullet(Tank tank){
+        this.source = tank;
         this.rotation = tank.getRotation();
-        this.bulletMovementProgress = 1f;
+        this.bulletMovementProgress = 0f;
         this.graphics = new Graphics(new Texture(bulletTexturePath));
 
         switch (this.rotation){
@@ -55,8 +58,8 @@ public class Bullet implements IMoveable{
                 break;
             }
         }
-        this.destinationCoordinates = tank.getDestinationCoordinates();
         this.currentCoordinates = tank.getCurrentCoordinates().cpy().add(moveVector.vector);
+        this.destinationCoordinates = this.currentCoordinates.cpy();
 
     }
 
@@ -97,5 +100,8 @@ public class Bullet implements IMoveable{
     }
     public MoveVector getMoveVector() {
         return moveVector;
+    }
+    public Tank getSource() {
+        return source;
     }
 }

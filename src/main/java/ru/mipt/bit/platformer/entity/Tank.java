@@ -1,6 +1,11 @@
 package ru.mipt.bit.platformer.entity;
 
 import com.badlogic.gdx.math.GridPoint2;
+import ru.mipt.bit.platformer.commands.CommandType;
+import ru.mipt.bit.platformer.tankstate.HardState;
+import ru.mipt.bit.platformer.tankstate.LightState;
+import ru.mipt.bit.platformer.tankstate.MediumState;
+import ru.mipt.bit.platformer.tankstate.TankState;
 import ru.mipt.bit.platformer.util.Graphics;
 import ru.mipt.bit.platformer.util.Rotation;
 
@@ -10,18 +15,28 @@ import java.util.Random;
 import static com.badlogic.gdx.math.MathUtils.isEqual;
 
 public class Tank implements IMoveable{
+    private TankState state;
     private Graphics graphics;
+    private Graphics hpBar;
     private Rotation rotation;
     private GridPoint2 currentCoordinates;
     private GridPoint2 destinationCoordinates;
     private float playerMovementProgress;
-    private int health;
+    private final int startHealth = 10;
+    private int health = startHealth;
     public Tank(GridPoint2 destinationCoordinates, GridPoint2 currentCoordinates, Rotation rotation) {
         this.destinationCoordinates = destinationCoordinates;
         this.currentCoordinates = currentCoordinates;
         this.rotation = rotation;
         this.playerMovementProgress = 1f;
-        this.health = 2;
+        this.state = new LightState(this);
+    }
+
+    public void calculateMovement(float deltaTime, float MOVEMENT_SPEED, Level level){
+        state.calculateMovementProgress(deltaTime,MOVEMENT_SPEED,level);
+    }
+    public boolean validateCommand(CommandType cmdType){
+        return state.validateCommand(cmdType);
     }
 
     static public Tank createPlayerWithRandomPos(int levelWidth, int levelHeight){
@@ -40,7 +55,7 @@ public class Tank implements IMoveable{
             int x = ran.nextInt(level.getWidth() - 1) + 1;
             int y = ran.nextInt(level.getHeight() - 1) + 1;
 
-            if (level.getObjectByCoords(x,y) != TileObject.FREE)
+            if (!level.getObjectByCoords(x,y).isEmpty())
                 continue;
 
             int rot = ran.nextInt(4);
@@ -58,6 +73,14 @@ public class Tank implements IMoveable{
 
     public void setGraphics(Graphics graphics) {
         this.graphics = graphics;
+    }
+
+    public Graphics getHpBar() {
+        return hpBar;
+    }
+
+    public void setHpBar(Graphics hpBar) {
+        this.hpBar = hpBar;
     }
 
     public Rotation getRotation() {
@@ -96,7 +119,16 @@ public class Tank implements IMoveable{
         return health;
     }
 
-    public void setHealth(int health) {
+    public void updateHealth(int health)
+    {
+        if (this.health >= 0.7 * startHealth && health < 0.7 * startHealth){
+            this.state = new MediumState(this);
+        }
+        else if (this.health > 0.15 * startHealth && health < 0.15 * startHealth){
+            this.state = new HardState(this);
+        }
+
         this.health = health;
+
     }
 }

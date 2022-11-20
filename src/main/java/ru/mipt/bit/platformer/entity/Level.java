@@ -17,7 +17,7 @@ public class Level {
     private ArrayList<Tank> bots;
 
     private HashSet<Bullet> bullets;
-    ArrayList<ArrayList<TileObject>> levelMap;
+    ArrayList<ArrayList<HashSet<TileObject>>> levelMap;
 
     ArrayList<IEventListener> subscribers;
 
@@ -27,9 +27,10 @@ public class Level {
 
         levelMap = new ArrayList<>();
         for (int h = 0;h < height;h++){
-            ArrayList<TileObject> line = new ArrayList<>();
+            ArrayList<HashSet<TileObject>> line = new ArrayList<>();
             for (int w = 0;w < width;w++){
-                line.add(TileObject.FREE);
+                HashSet<TileObject> cellHS = new HashSet<>();
+                line.add(cellHS);
             }
             levelMap.add(line);
         }
@@ -53,7 +54,7 @@ public class Level {
     }
 
     public void addObjectOnMap(int x,int y, TileObject objectType){
-        levelMap.get(y).set(x,objectType);
+        levelMap.get(y).get(x).add(objectType);
     }
 
     public void createLevel(ICreationMapStrategy creationMapStrategy, CreationMapParams params, int botsCount){
@@ -72,13 +73,24 @@ public class Level {
         notifySubscribers();
     }
 
-    public boolean checkCollision(GridPoint2 bulletDestCoords){
-        if (bulletDestCoords.x < 0 || bulletDestCoords.x >= width || bulletDestCoords.y < 0 || bulletDestCoords.y >= height)
+    public boolean checkCollision(GridPoint2 destCoords){
+        if (destCoords.x < 0 || destCoords.x >= width || destCoords.y < 0 || destCoords.y >= height)
             return true;
-        if (this.getObjectByCoords(bulletDestCoords.x,bulletDestCoords.y) != TileObject.FREE){
+        HashSet<TileObject> tileObjects = this.getObjectByCoords(destCoords.x,destCoords.y);
+        if (!tileObjects.isEmpty()){
             return true;
         }
         return false;
+    }
+
+    public HashSet<TileObject> checkCollisionBullet(GridPoint2 destCoords){
+        if (destCoords.x < 0 || destCoords.x >= width || destCoords.y < 0 || destCoords.y >= height) {
+            HashSet<TileObject> cellHS = new HashSet<>();
+            cellHS.add(TileObject.OBSTACLE);
+            return cellHS;
+        }
+        HashSet<TileObject> tileObjects = this.getObjectByCoords(destCoords.x,destCoords.y);
+        return tileObjects;
     }
 
     public void addBullet(Bullet bullet){
@@ -95,20 +107,22 @@ public class Level {
 
     public void removeBot(Tank bot){
         clearTile(bot.getCurrentCoordinates());
+        clearTile(bot.getDestinationCoordinates());
         bots.remove(bot);
         notifySubscribers();
     }
 
     public void moveObjects(IMoveable movableObject, TileObject objectType){
-        levelMap.get(movableObject.getCurrentCoordinates().y).set(movableObject.getCurrentCoordinates().x,objectType);
-        levelMap.get(movableObject.getDestinationCoordinates().y).set(movableObject.getDestinationCoordinates().x,objectType);
+        levelMap.get(movableObject.getCurrentCoordinates().y).get(movableObject.getCurrentCoordinates().x).add(objectType);
+        levelMap.get(movableObject.getDestinationCoordinates().y).get(movableObject.getDestinationCoordinates().x).add(objectType);
     }
 
     public void clearTile(GridPoint2 coords){
-        levelMap.get(coords.y).set(coords.x,TileObject.FREE);
+        HashSet<TileObject> cellHS = new HashSet<>();
+        levelMap.get(coords.y).set(coords.x,cellHS);
     }
 
-    public TileObject getObjectByCoords(int x,int y){
+    public HashSet<TileObject> getObjectByCoords(int x,int y){
         return levelMap.get(y).get(x);
     }
 

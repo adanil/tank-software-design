@@ -1,10 +1,9 @@
 package ru.mipt.bit.platformer.control;
 
-import ru.mipt.bit.platformer.commands.Command;
-import ru.mipt.bit.platformer.commands.CommandGenerator;
+import ru.mipt.bit.platformer.commands.*;
+import ru.mipt.bit.platformer.entity.Bullet;
 import ru.mipt.bit.platformer.entity.Level;
 import ru.mipt.bit.platformer.entity.Tank;
-import ru.mipt.bit.platformer.commands.MoveCommand;
 import ru.mipt.bit.platformer.util.MoveVector;
 import ru.mipt.bit.platformer.entity.TileObject;
 
@@ -28,21 +27,22 @@ public class BotControl implements IMoveControl, CommandGenerator {
     public Collection<Command> generateCommands(Tank bot, Level level) {
         ArrayList<Command> commands = new ArrayList<>();
         Random ran = new Random();
-        int mv = ran.nextInt(4);
-        commands.add(new MoveCommand(bot,MoveVector.values()[mv], TileObject.BOT, level));
+        int mv = ran.nextInt(5);
+        if (mv < 4) {
+            if (bot.validateCommand(CommandType.MOVE))
+                commands.add(new MoveCommand(bot, MoveVector.values()[mv], TileObject.BOT, level));
+        }
+        else {
+            if (bot.validateCommand(CommandType.SHOOT))
+                commands.add(new Shoot(new Bullet(bot), level,bot));
+        }
         return commands;
     }
 
     @Override
     public void calculateMovementProgress(float deltaTime, float MOVEMENT_SPEED){
         for (Tank tank : bots) {
-            tank.setPlayerMovementProgress(continueProgress(tank.getPlayerMovementProgress(), deltaTime, MOVEMENT_SPEED));
-            if (isEqual(tank.getPlayerMovementProgress(), 1f)) {
-                // record that the player has reached his/her destination
-                if (!tank.getDestinationCoordinates().equals(tank.getCurrentCoordinates()))
-                    level.clearTile(tank.getCurrentCoordinates());
-                tank.setCurrentCoordinates(tank.getDestinationCoordinates());
-            }
+            tank.calculateMovement(deltaTime,MOVEMENT_SPEED,level);
         }
     }
 
