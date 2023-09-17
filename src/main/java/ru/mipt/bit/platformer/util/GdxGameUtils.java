@@ -1,5 +1,6 @@
 package ru.mipt.bit.platformer.util;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.Map;
@@ -15,6 +16,7 @@ import com.badlogic.gdx.math.Vector2;
 
 import java.util.NoSuchElementException;
 
+import static com.badlogic.gdx.graphics.GL20.GL_COLOR_BUFFER_BIT;
 import static com.badlogic.gdx.math.MathUtils.clamp;
 
 public final class GdxGameUtils {
@@ -47,9 +49,9 @@ public final class GdxGameUtils {
         }
     }
 
-    public static Rectangle moveRectangleAtTileCenter(TiledMapTileLayer tileLayer, Rectangle rectangle, GridPoint2 tileCoordinates) {
+    public static Rectangle moveRectangleAtTileCenter(TiledMapTileLayer tileLayer, Graphics graphics, GridPoint2 tileCoordinates) {
         Vector2 tileCenter = calculateTileCenter(tileLayer, tileCoordinates);
-        return rectangle.setCenter(tileCenter);
+        return graphics.getRectangle().setCenter(tileCenter);
     }
 
     public static GridPoint2 incrementedY(GridPoint2 point) {
@@ -68,7 +70,9 @@ public final class GdxGameUtils {
         return new GridPoint2(point).add(1, 0);
     }
 
-    public static void drawTextureRegionUnscaled(Batch batch, TextureRegion region, Rectangle rectangle, float rotation) {
+    public static void drawTextureRegionUnscaled(Batch batch, Graphics graphics, float rotation) {
+        Rectangle rectangle = graphics.getRectangle();
+        TextureRegion region = graphics.getGraphics();
         int regionWidth = region.getRegionWidth();
         int regionHeight = region.getRegionHeight();
         float regionOriginX = regionWidth / 2f;
@@ -98,5 +102,12 @@ public final class GdxGameUtils {
                 .setWidth(tileWidth)
                 .setHeight(tileHeight)
                 .getCenter(new Vector2());
+    }
+
+    public static void clearWindow(){
+        // clear the screen
+        Gdx.gl.glClearColor(0f, 0f, 0.2f, 1f);
+        Gdx.gl.glClear(GL_COLOR_BUFFER_BIT);
+
     }
 }
